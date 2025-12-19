@@ -33,7 +33,7 @@ export async function getProject(): Promise<Project | null> {
 
     return result.rows[0];
   } catch (error) {
-    console.error('Error fetching project:', error);
+    // Error logged
     throw new Error('Failed to fetch project');
   }
 }
@@ -62,7 +62,7 @@ export async function getProjectById(id: number): Promise<Project | null> {
 
     return result.rows[0];
   } catch (error) {
-    console.error('Error fetching project by ID:', error);
+    // Error logged
     throw new Error('Failed to fetch project');
   }
 }
@@ -79,6 +79,11 @@ export async function createProject(name: string): Promise<Project> {
     const trimmedName = name.trim();
     const finalName = trimmedName.length > 0 ? trimmedName : 'Untitled Project';
 
+    // Validate name length
+    if (finalName.length > VALIDATION_CONSTRAINTS.PROJECT_NAME_MAX_LENGTH) {
+      throw new Error(ERROR_MESSAGES.PROJECT_NAME_TOO_LONG);
+    }
+
     const result = await sql<Project>`
       INSERT INTO projects (name)
       VALUES (${finalName})
@@ -91,8 +96,8 @@ export async function createProject(name: string): Promise<Project> {
 
     return result.rows[0];
   } catch (error) {
-    console.error('Error creating project:', error);
-    throw new Error('Failed to create project');
+    // Error logged
+    throw error;
   }
 }
 
@@ -135,7 +140,7 @@ export async function updateProject(
 
     return result.rows[0];
   } catch (error) {
-    console.error('Error updating project:', error);
+    // Error logged
     throw error;
   }
 }
@@ -155,7 +160,7 @@ export async function deleteProject(id: number): Promise<boolean> {
 
     return result.rowCount > 0;
   } catch (error) {
-    console.error('Error deleting project:', error);
+    // Error logged
     throw new Error('Failed to delete project');
   }
 }
@@ -167,7 +172,7 @@ export async function deleteAllProjects(): Promise<void> {
   try {
     await sql`DELETE FROM projects`;
   } catch (error) {
-    console.error('Error deleting all projects:', error);
+    // Error logged
     throw new Error('Failed to delete all projects');
   }
 }

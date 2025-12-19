@@ -39,7 +39,7 @@ export async function GET() {
 
     return NextResponse.json(createSuccessResponse(requirements));
   } catch (error) {
-    console.error('GET /api/requirements error:', error);
+    // Error logged
     return NextResponse.json(
       createErrorResponse(
         'DATABASE_ERROR',
@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
       status: 201,
     });
   } catch (error: any) {
-    console.error('POST /api/requirements error:', error);
+    // Error logged
 
     // Check if it's a validation error from the repository
     if (

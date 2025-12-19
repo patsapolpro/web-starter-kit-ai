@@ -39,7 +39,7 @@ export async function GET() {
 
     return NextResponse.json(createSuccessResponse(project));
   } catch (error) {
-    console.error('GET /api/project error:', error);
+    // Error logged
     return NextResponse.json(
       createErrorResponse(
         'DATABASE_ERROR',
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(createSuccessResponse(project), { status: 201 });
   } catch (error: any) {
-    console.error('POST /api/project error:', error);
+    // Error logged
 
     // Check if it's a validation error from the repository
     if (error.message?.includes('exceed') || error.message?.includes('empty') || error.message?.includes('required')) {
@@ -144,7 +144,7 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json(createSuccessResponse(updatedProject));
   } catch (error: any) {
-    console.error('PUT /api/project error:', error);
+    // Error logged
 
     // Check if it's a validation error from the repository
     if (error.message?.includes('exceed') || error.message?.includes('empty') || error.message?.includes('required')) {

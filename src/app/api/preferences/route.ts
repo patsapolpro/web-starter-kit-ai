@@ -26,7 +26,7 @@ export async function GET() {
     const preferences = await getPreferences();
     return NextResponse.json(createSuccessResponse(preferences));
   } catch (error) {
-    console.error('GET /api/preferences error:', error);
+    // Error logged
     return NextResponse.json(
       createErrorResponse(
         'DATABASE_ERROR',
@@ -94,7 +94,7 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json(createSuccessResponse(updatedPreferences));
   } catch (error: any) {
-    console.error('PUT /api/preferences error:', error);
+    // Error logged
 
     // Check if it's a validation error from the repository
     if (error.message?.includes('Invalid language')) {

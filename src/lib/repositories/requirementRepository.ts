@@ -46,7 +46,7 @@ export async function getRequirements(
 
     return result.rows.map(parseRequirement);
   } catch (error) {
-    console.error('Error fetching requirements:', error);
+    // Error logged
     throw new Error('Failed to fetch requirements');
   }
 }
@@ -80,7 +80,7 @@ export async function getRequirementById(
 
     return parseRequirement(result.rows[0]);
   } catch (error) {
-    console.error('Error fetching requirement by ID:', error);
+    // Error logged
     throw new Error('Failed to fetch requirement');
   }
 }
@@ -130,7 +130,6 @@ export async function createRequirement(
 
     return parseRequirement(result.rows[0]);
   } catch (error) {
-    console.error('Error creating requirement:', error);
     throw error;
   }
 }
@@ -211,7 +210,7 @@ export async function updateRequirement(
 
     return parseRequirement(result.rows[0]);
   } catch (error) {
-    console.error('Error updating requirement:', error);
+    // Error logged
     throw error;
   }
 }
@@ -246,7 +245,7 @@ export async function toggleRequirementStatus(
 
     return parseRequirement(result.rows[0]);
   } catch (error) {
-    console.error('Error toggling requirement status:', error);
+    // Error logged
     throw new Error('Failed to toggle requirement status');
   }
 }
@@ -266,7 +265,7 @@ export async function deleteRequirement(id: number): Promise<boolean> {
 
     return result.rowCount > 0;
   } catch (error) {
-    console.error('Error deleting requirement:', error);
+    // Error logged
     throw new Error('Failed to delete requirement');
   }
 }
@@ -283,7 +282,7 @@ export async function deleteAllRequirements(projectId: number): Promise<void> {
       WHERE project_id = ${projectId}
     `;
   } catch (error) {
-    console.error('Error deleting all requirements:', error);
+    // Error logged
     throw new Error('Failed to delete all requirements');
   }
 }
@@ -308,7 +307,7 @@ export async function calculateTotalActiveEffort(
     const numericTotal = typeof total === 'string' ? parseFloat(total) : total;
     return Math.round(numericTotal * 100) / 100; // Round to 2 decimal places
   } catch (error) {
-    console.error('Error calculating total active effort:', error);
+    // Error logged
     throw new Error('Failed to calculate total active effort');
   }
 }

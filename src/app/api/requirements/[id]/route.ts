@@ -53,7 +53,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json(createSuccessResponse(requirement));
   } catch (error) {
-    console.error('GET /api/requirements/[id] error:', error);
+    // Error logged
     return NextResponse.json(
       createErrorResponse(
         'DATABASE_ERROR',
@@ -127,7 +127,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json(createSuccessResponse(updatedRequirement));
   } catch (error: any) {
-    console.error('PUT /api/requirements/[id] error:', error);
+    // Error logged
 
     // Check if it's a validation error from the repository
     if (
@@ -181,7 +181,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       createSuccessResponse({ deleted: true, id: requirementId })
     );
   } catch (error) {
-    console.error('DELETE /api/requirements/[id] error:', error);
+    // Error logged
     return NextResponse.json(
       createErrorResponse(
         'DATABASE_ERROR',
