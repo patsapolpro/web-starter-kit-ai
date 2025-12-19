@@ -1,30 +1,31 @@
 import React from 'react';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'danger';
-  size?: 'small' | 'medium' | 'large';
+  variant?: 'primary' | 'secondary' | 'danger' | 'success';
+  size?: 'sm' | 'md' | 'lg';
   children: React.ReactNode;
 }
 
 export function Button({
   variant = 'primary',
-  size = 'medium',
-  children,
+  size = 'md',
   className = '',
+  children,
   ...props
 }: ButtonProps) {
-  const baseClasses = 'font-semibold rounded-xl transition-all duration-300 ease-in-out';
+  const baseClasses = 'font-semibold rounded-xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2';
 
   const variantClasses = {
-    primary: 'bg-gradient-to-r from-[#667eea] to-[#764ba2] text-white hover:shadow-lg hover:-translate-y-0.5',
-    secondary: 'bg-white text-gray-600 border-2 border-gray-200 hover:bg-gray-50',
-    danger: 'bg-white text-red-600 border-2 border-red-200 hover:bg-red-50 hover:border-red-300',
+    primary: 'bg-gradient-to-r from-primary-600 via-primary-600 to-accent-600 hover:from-primary-700 hover:via-primary-700 hover:to-accent-700 text-white shadow-glow hover:shadow-glow-lg',
+    secondary: 'bg-white border border-gray-200 hover:border-gray-300 text-gray-700 hover:bg-gray-50 shadow-sm hover:shadow',
+    danger: 'bg-danger-600 hover:bg-danger-700 text-white shadow-sm hover:shadow-lg',
+    success: 'bg-success-500 hover:bg-success-600 text-white shadow-md hover:shadow-lg',
   };
 
   const sizeClasses = {
-    small: 'px-4 py-2 text-sm',
-    medium: 'px-6 py-3 text-base',
-    large: 'px-8 py-4 text-lg',
+    sm: 'px-3 py-1.5 text-xs',
+    md: 'px-4 py-2 text-sm',
+    lg: 'px-5 py-3 text-base',
   };
 
   return (

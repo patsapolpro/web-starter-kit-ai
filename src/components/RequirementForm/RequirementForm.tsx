@@ -2,102 +2,129 @@
 
 import React, { useState } from 'react';
 import { Textarea } from '@/components/UI/Textarea';
-import { Input } from '@/components/UI/Input';
 import { Button } from '@/components/UI/Button';
 import { validateDescription, validateEffort } from '@/lib/validation/requirementValidation';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface RequirementFormProps {
   onAddRequirement: (description: string, effort: number) => void;
 }
 
 export function RequirementForm({ onAddRequirement }: RequirementFormProps) {
+  const { t } = useLanguage();
   const [description, setDescription] = useState('');
   const [effort, setEffort] = useState('');
   const [descriptionError, setDescriptionError] = useState('');
   const [effortError, setEffortError] = useState('');
-  const [showErrors, setShowErrors] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setShowErrors(true);
+  const handleSubmit = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
 
+    // Clear previous errors
+    setDescriptionError('');
+    setEffortError('');
+
+    // Validate description
     const descValidation = validateDescription(description);
-    const effortValidation = validateEffort(effort);
-
     if (!descValidation.valid) {
       setDescriptionError(descValidation.error || '');
-    } else {
-      setDescriptionError('');
+      return;
     }
 
+    // Validate effort
+    const effortValidation = validateEffort(effort);
     if (!effortValidation.valid) {
       setEffortError(effortValidation.error || '');
-    } else {
-      setEffortError('');
+      return;
     }
 
-    if (descValidation.valid && effortValidation.valid) {
-      onAddRequirement(descValidation.value as string, effortValidation.value as number);
+    // Both validations passed
+    if (descValidation.value && effortValidation.value !== undefined) {
+      onAddRequirement(descValidation.value, effortValidation.value);
+
+      // Clear form
       setDescription('');
       setEffort('');
-      setShowErrors(false);
-      setDescriptionError('');
-      setEffortError('');
-    }
-  };
-
-  const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setDescription(e.target.value);
-    if (showErrors) {
-      const validation = validateDescription(e.target.value);
-      setDescriptionError(validation.valid ? '' : validation.error || '');
-    }
-  };
-
-  const handleEffortChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEffort(e.target.value);
-    if (showErrors) {
-      const validation = validateEffort(e.target.value);
-      setEffortError(validation.valid ? '' : validation.error || '');
     }
   };
 
   return (
-    <div className="bg-white/95 backdrop-blur-md rounded-2xl px-10 py-8 shadow-xl mb-5">
-      <h2 className="text-xl font-semibold text-gray-800 mb-5">Add New Requirement</h2>
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <Textarea
-            label="Requirement Description"
-            value={description}
-            onChange={handleDescriptionChange}
-            placeholder="Enter requirement description"
-            maxLength={500}
-            rows={3}
-            error={descriptionError}
-            showError={showErrors && !!descriptionError}
-          />
+    <section className="animate-fade-in-up-delay-3">
+      <div className="glass rounded-2xl lg:rounded-3xl shadow-soft-lg p-5 lg:p-6 border border-white/60">
+        {/* Section Header */}
+        <div className="flex items-center mb-5">
+          <div className="w-10 h-10 lg:w-11 lg:h-11 bg-gradient-to-br from-primary-500 to-accent-500 rounded-xl flex items-center justify-center mr-3 shadow-glow">
+            <i className="fa-solid fa-plus text-white text-sm lg:text-base"></i>
+          </div>
+          <div>
+            <h2 className="text-lg lg:text-xl font-bold text-gray-800">{t('form.addTitle')}</h2>
+            <p className="text-xs lg:text-sm text-gray-500 mt-0.5">{t('form.addSubtitle')}</p>
+          </div>
         </div>
-        <div className="flex gap-3 items-end">
-          <div className="flex-1">
-            <Input
-              type="number"
-              label="Effort"
-              value={effort}
-              onChange={handleEffortChange}
-              placeholder="0.0"
-              step="0.1"
-              min="0.1"
-              max="1000"
-              error={effortError}
-              showError={showErrors && !!effortError}
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Description Field */}
+          <div>
+            <label htmlFor="requirement-description" className="text-xs lg:text-sm font-semibold text-gray-700 mb-2 flex items-center gap-1.5">
+              <i className="fa-solid fa-file-lines text-primary-500 text-xs"></i>
+              {t('form.descriptionLabel')}
+              <span className="text-danger-500">{t('form.required')}</span>
+            </label>
+            <Textarea
+              id="requirement-description"
+              value={description}
+              onChange={(e) => {
+                setDescription(e.target.value);
+                setDescriptionError('');
+              }}
+              rows={3}
+              maxLength={500}
+              showCharCount
+              currentLength={description.length}
+              placeholder={t('form.descriptionPlaceholder')}
+              error={descriptionError}
             />
           </div>
-          <Button type="submit" size="medium">
-            Add Requirement
+
+          {/* Effort Field */}
+          <div>
+            <label htmlFor="effort-value" className="text-xs lg:text-sm font-semibold text-gray-700 mb-2 flex items-center gap-1.5">
+              <i className="fa-solid fa-clock text-accent-500 text-xs"></i>
+              {t('form.effortLabel')}
+              <span className="text-danger-500">{t('form.required')}</span>
+            </label>
+            <input
+              type="number"
+              id="effort-value"
+              value={effort}
+              onChange={(e) => {
+                setEffort(e.target.value);
+                setEffortError('');
+              }}
+              step="0.01"
+              min="0"
+              max="1000"
+              className="w-full px-4 py-3 text-sm lg:text-base border-2 border-gray-200/80 rounded-xl focus:outline-none focus:border-accent-400 focus:ring-4 focus:ring-accent-100 transition-smooth bg-white/70 backdrop-blur-sm placeholder:text-gray-400"
+              placeholder={t('form.effortPlaceholder')}
+            />
+            {effortError && (
+              <div className="mt-2 p-3 bg-danger-50 border border-danger-200 rounded-xl">
+                <div className="flex items-center gap-2">
+                  <i className="fa-solid fa-circle-exclamation text-danger-500 text-sm"></i>
+                  <span className="text-xs lg:text-sm text-danger-700 font-medium">{effortError}</span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Add Button */}
+          <Button type="submit" className="w-full">
+            <i className="fa-solid fa-plus"></i>
+            <span>{t('form.addButton')}</span>
           </Button>
-        </div>
-      </form>
-    </div>
+        </form>
+      </div>
+    </section>
   );
 }

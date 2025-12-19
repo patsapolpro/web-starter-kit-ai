@@ -28,7 +28,6 @@ export const DEFAULTS = {
   REQUIREMENT_STATUS: true,
   EFFORT_COLUMN_VISIBLE: true,
   SHOW_TOTAL_WHEN_HIDDEN: true,
-  SCHEMA_VERSION: '1.0.0',
 } as const;
 
 /**
@@ -41,5 +40,6 @@ export const ERROR_MESSAGES = {
   EFFORT_MUST_BE_NUMBER: 'Effort must be a number',
   EFFORT_MUST_BE_POSITIVE: 'Effort must be greater than 0',
   EFFORT_TOO_LARGE: 'Effort must not exceed 1000',
+  PROJECT_NAME_REQUIRED: 'Project name is required',
   PROJECT_NAME_TOO_LONG: 'Project name must not exceed 100 characters',
 } as const;

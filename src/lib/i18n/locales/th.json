@@ -1,0 +1,71 @@
+{
+  "app": {
+    "title": "ระบบติดตามความต้องการและความพยายาม",
+    "subtitle": "ผู้ช่วยวางแผนโครงการอัจฉริยะของคุณ",
+    "loading": "กำลังโหลด..."
+  },
+  "setup": {
+    "title": "มาเริ่มกันเลย",
+    "projectNameLabel": "ชื่อโครงการ",
+    "projectNamePlaceholder": "กรอกชื่อโครงการ...",
+    "createButton": "สร้างโครงการ",
+    "creating": "กำลังสร้าง..."
+  },
+  "header": {
+    "newProject": "โครงการใหม่",
+    "hideEffort": "ซ่อนความพยายาม",
+    "showEffort": "แสดงความพยายาม",
+    "language": "ภาษา"
+  },
+  "requirements": {
+    "title": "รายการความต้องการ",
+    "totalRequirements": "ความต้องการทั้งหมด",
+    "active": "เปิดใช้งาน",
+    "inactive": "ปิดใช้งาน",
+    "emptyTitle": "ยังไม่มีความต้องการ",
+    "emptyMessage": "เพิ่มความต้องการแรกของคุณเพื่อเริ่มติดตามโครงการ",
+    "status": "สถานะ",
+    "description": "รายละเอียด",
+    "effort": "ความพยายาม",
+    "actions": "การดำเนินการ"
+  },
+  "form": {
+    "addTitle": "เพิ่มความต้องการใหม่",
+    "addSubtitle": "กรอกรายละเอียดด้านล่าง",
+    "descriptionLabel": "รายละเอียดความต้องการ",
+    "descriptionPlaceholder": "กรอกรายละเอียดความต้องการ...",
+    "effortLabel": "ความพยายาม",
+    "effortPlaceholder": "เช่น 5.5",
+    "addButton": "เพิ่มความต้องการ",
+    "editButton": "แก้ไข",
+    "deleteButton": "ลบ",
+    "saveButton": "บันทึก",
+    "cancelButton": "ยกเลิก",
+    "editing": "กำลังแก้ไข...",
+    "required": "*"
+  },
+  "effort": {
+    "title": "สรุปความพยายาม",
+    "totalActiveEffort": "ความพยายามรวมที่เปิดใช้งาน"
+  },
+  "modal": {
+    "deleteTitle": "ลบความต้องการ?",
+    "deleteMessage": "การกระทำนี้ไม่สามารถยกเลิกได้ ความต้องการจะถูกลบอย่างถาวร",
+    "deleteConfirm": "ใช่, ลบ",
+    "deleteCancel": "ยกเลิก",
+    "clearTitle": "เริ่มโครงการใหม่?",
+    "clearMessage": "การกระทำนี้จะลบความต้องการและข้อมูลปัจจุบันทั้งหมด โปรดแน่ใจว่าคุณได้ส่งออกข้อมูลของคุณแล้วหากต้องการ",
+    "clearConfirm": "ใช่, เริ่มใหม่",
+    "clearCancel": "ยกเลิก"
+  },
+  "validation": {
+    "descriptionRequired": "ต้องระบุรายละเอียดความต้องการ",
+    "descriptionTooLong": "รายละเอียดต้องไม่เกิน 500 ตัวอักษร",
+    "effortRequired": "ต้องระบุค่าความพยายาม",
+    "effortMustBeNumber": "ความพยายามต้องเป็นตัวเลข",
+    "effortMustBePositive": "ความพยายามต้องมากกว่า 0",
+    "effortTooLarge": "ความพยายามต้องไม่เกิน 1000",
+    "projectNameRequired": "ต้องระบุชื่อโครงการ",
+    "projectNameTooLong": "ชื่อโครงการต้องไม่เกิน 100 ตัวอักษร"
+  }
+}

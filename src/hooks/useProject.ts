@@ -2,30 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import type { Project } from '@/types/project';
-import {
-  getProject,
-  createProject as createProjectStorage,
-  updateProjectName as updateProjectNameStorage,
-} from '@/lib/storage/project';
+import { getProject, createProject as createProjectStorage, updateProjectName as updateProjectNameStorage } from '@/lib/storage/project';
 
-export interface UseProjectReturn {
-  project: Project | null;
-  isLoading: boolean;
-  updateProjectName: (name: string) => void;
-  createProject: (name: string) => void;
-}
-
-export function useProject(): UseProjectReturn {
+export function useProject() {
   const [project, setProject] = useState<Project | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Load project from localStorage on mount
     const loadedProject = getProject();
-    if (loadedProject) {
-      setProject(loadedProject);
-    }
-    // Don't auto-create project - let setup page handle first-time creation
+    setProject(loadedProject);
     setIsLoading(false);
   }, []);
 
@@ -37,7 +22,7 @@ export function useProject(): UseProjectReturn {
     }
   };
 
-  const createProject = (name: string) => {
+  const createNewProject = (name: string) => {
     const newProject = createProjectStorage(name);
     setProject(newProject);
   };
@@ -46,6 +31,6 @@ export function useProject(): UseProjectReturn {
     project,
     isLoading,
     updateProjectName,
-    createProject,
+    createProject: createNewProject,
   };
 }

@@ -3,35 +3,48 @@ import React from 'react';
 interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: string;
   error?: string;
-  showError?: boolean;
+  showCharCount?: boolean;
+  currentLength?: number;
 }
 
 export function Textarea({
   label,
   error,
-  showError = false,
+  showCharCount = false,
+  currentLength = 0,
   className = '',
+  maxLength,
   ...props
 }: TextareaProps) {
   return (
-    <div className="flex flex-col gap-2">
+    <div className="w-full">
       {label && (
-        <label className="text-gray-700 font-semibold text-sm">
+        <label className="block text-sm font-semibold text-gray-700 mb-2">
           {label}
+          {props.required && <span className="text-danger-500 ml-1">*</span>}
         </label>
       )}
-      <textarea
-        className={`
-          px-4 py-3 border-2 rounded-xl text-base text-black
-          transition-all duration-300 resize-vertical
-          focus:outline-none focus:border-[#667eea] focus:ring-4 focus:ring-[#667eea]/10
-          ${showError && error ? 'border-red-500' : 'border-gray-200'}
-          ${className}
-        `}
-        {...props}
-      />
-      {showError && error && (
-        <span className="text-red-600 text-sm">{error}</span>
+      <div className="relative">
+        <textarea
+          className={`w-full px-4 py-3 text-base border-2 border-gray-200 rounded-xl focus:outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-100 transition-all duration-200 bg-white/50 backdrop-blur-sm resize-none ${
+            error ? 'border-danger-500 focus:border-danger-500 focus:ring-danger-100' : ''
+          } ${className}`}
+          maxLength={maxLength}
+          {...props}
+        />
+        {showCharCount && maxLength && (
+          <div className="absolute bottom-2.5 right-3 text-xs text-gray-400 font-medium bg-white/80 px-1.5 py-0.5 rounded">
+            <span>{currentLength}</span>/{maxLength}
+          </div>
+        )}
+      </div>
+      {error && (
+        <div className="mt-2 p-3 bg-danger-50 border border-danger-200 rounded-xl">
+          <div className="flex items-center gap-2">
+            <i className="fa-solid fa-circle-exclamation text-danger-500 text-sm"></i>
+            <span className="text-sm text-danger-700 font-medium">{error}</span>
+          </div>
+        </div>
       )}
     </div>
   );

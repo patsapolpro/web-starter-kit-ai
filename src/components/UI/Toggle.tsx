@@ -8,25 +8,21 @@ interface ToggleProps {
 
 export function Toggle({ checked, onChange, label }: ToggleProps) {
   return (
-    <div
-      className="flex items-center gap-3 cursor-pointer select-none"
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
       onClick={onChange}
+      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-300 shadow-sm hover:shadow ${
+        checked ? 'bg-success-500 hover:bg-success-600' : 'bg-gray-300 hover:bg-gray-400'
+      }`}
+      aria-label={label}
     >
-      {label && <span className="text-gray-700 text-sm font-medium">{label}</span>}
-      <div
-        className={`
-          w-12 h-6 rounded-full relative transition-all duration-300
-          ${checked ? 'bg-[#667eea]' : 'bg-gray-300'}
-        `}
-      >
-        <div
-          className={`
-            absolute top-0.5 w-5 h-5 bg-white rounded-full
-            shadow-md transition-all duration-300
-            ${checked ? 'left-[26px]' : 'left-0.5'}
-          `}
-        />
-      </div>
-    </div>
+      <span
+        className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-md transition-transform duration-300 ${
+          checked ? 'translate-x-6' : 'translate-x-1'
+        }`}
+      />
+    </button>
   );
 }

@@ -6,31 +6,23 @@ import { getItem, setItem } from './localStorage';
  * Get user preferences from localStorage
  */
 export function getPreferences(): UserPreferences {
-  const data = getItem(STORAGE_KEYS.PREFERENCES);
-  if (!data) {
+  const preferences = getItem<UserPreferences>(STORAGE_KEYS.PREFERENCES);
+
+  if (!preferences) {
     return {
       effortColumnVisible: DEFAULTS.EFFORT_COLUMN_VISIBLE,
       showTotalWhenEffortHidden: DEFAULTS.SHOW_TOTAL_WHEN_HIDDEN,
     };
   }
 
-  try {
-    return JSON.parse(data) as UserPreferences;
-  } catch (error) {
-    console.error('Failed to parse preferences:', error);
-    return {
-      effortColumnVisible: DEFAULTS.EFFORT_COLUMN_VISIBLE,
-      showTotalWhenEffortHidden: DEFAULTS.SHOW_TOTAL_WHEN_HIDDEN,
-    };
-  }
+  return preferences;
 }
 
 /**
  * Update user preferences
  */
 export function updatePreferences(updates: Partial<UserPreferences>): void {
-  const preferences = getPreferences();
-  const newPreferences = { ...preferences, ...updates };
-
-  setItem(STORAGE_KEYS.PREFERENCES, JSON.stringify(newPreferences));
+  const currentPreferences = getPreferences();
+  const newPreferences = { ...currentPreferences, ...updates };
+  setItem(STORAGE_KEYS.PREFERENCES, newPreferences);
 }

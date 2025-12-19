@@ -1,0 +1,71 @@
+{
+  "app": {
+    "title": "Requirement & Effort Tracker",
+    "subtitle": "Your intelligent project planning companion",
+    "loading": "Loading..."
+  },
+  "setup": {
+    "title": "Let's Get Started",
+    "projectNameLabel": "Project Name",
+    "projectNamePlaceholder": "Enter project name...",
+    "createButton": "Create Project",
+    "creating": "Creating..."
+  },
+  "header": {
+    "newProject": "New Project",
+    "hideEffort": "Hide Effort",
+    "showEffort": "Show Effort",
+    "language": "Language"
+  },
+  "requirements": {
+    "title": "Requirements List",
+    "totalRequirements": "total requirements",
+    "active": "Active",
+    "inactive": "Inactive",
+    "emptyTitle": "No requirements yet",
+    "emptyMessage": "Add your first requirement to get started tracking your project.",
+    "status": "Status",
+    "description": "Description",
+    "effort": "Effort",
+    "actions": "Actions"
+  },
+  "form": {
+    "addTitle": "Add New Requirement",
+    "addSubtitle": "Fill in the details below",
+    "descriptionLabel": "Requirement Description",
+    "descriptionPlaceholder": "Enter requirement description...",
+    "effortLabel": "Effort",
+    "effortPlaceholder": "e.g., 5.5",
+    "addButton": "Add Requirement",
+    "editButton": "Edit",
+    "deleteButton": "Delete",
+    "saveButton": "Save",
+    "cancelButton": "Cancel",
+    "editing": "Editing...",
+    "required": "*"
+  },
+  "effort": {
+    "title": "Effort Summary",
+    "totalActiveEffort": "Total Active Effort"
+  },
+  "modal": {
+    "deleteTitle": "Delete Requirement?",
+    "deleteMessage": "This action cannot be undone. The requirement will be permanently removed.",
+    "deleteConfirm": "Yes, Delete",
+    "deleteCancel": "Cancel",
+    "clearTitle": "Start New Project?",
+    "clearMessage": "This will clear all current requirements and data. Make sure you've exported your data if needed.",
+    "clearConfirm": "Yes, Start New",
+    "clearCancel": "Cancel"
+  },
+  "validation": {
+    "descriptionRequired": "Requirement description is required",
+    "descriptionTooLong": "Description must not exceed 500 characters",
+    "effortRequired": "Effort value is required",
+    "effortMustBeNumber": "Effort must be a number",
+    "effortMustBePositive": "Effort must be greater than 0",
+    "effortTooLarge": "Effort must not exceed 1000",
+    "projectNameRequired": "Project name is required",
+    "projectNameTooLong": "Project name must not exceed 100 characters"
+  }
+}

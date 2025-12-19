@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import type { Requirement } from '@/types/requirement';
 import {
   getRequirements,
@@ -8,56 +8,44 @@ import {
   updateRequirement as updateRequirementStorage,
   deleteRequirement as deleteRequirementStorage,
   toggleRequirementStatus as toggleRequirementStatusStorage,
-  calculateTotalActiveEffort,
 } from '@/lib/storage/requirements';
+import { calculateTotalActiveEffort } from '@/lib/utils/calculations';
 
-export interface UseRequirementsReturn {
-  requirements: Requirement[];
-  isLoading: boolean;
-  addRequirement: (description: string, effort: number) => void;
-  updateRequirement: (id: string, updates: Partial<Requirement>) => void;
-  deleteRequirement: (id: string) => void;
-  toggleStatus: (id: string) => void;
-  totalActiveEffort: number;
-  refreshRequirements: () => void;
-}
-
-export function useRequirements(): UseRequirementsReturn {
+export function useRequirements() {
   const [requirements, setRequirements] = useState<Requirement[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [totalActiveEffort, setTotalActiveEffort] = useState(0);
-
-  const refreshRequirements = useCallback(() => {
-    const loadedRequirements = getRequirements();
-    setRequirements(loadedRequirements);
-    setTotalActiveEffort(calculateTotalActiveEffort());
-  }, []);
 
   useEffect(() => {
-    // Load requirements from localStorage on mount
-    refreshRequirements();
+    const loadedRequirements = getRequirements();
+    setRequirements(loadedRequirements);
     setIsLoading(false);
-  }, [refreshRequirements]);
+  }, []);
 
   const addRequirement = (description: string, effort: number) => {
-    createRequirementStorage(description, effort);
-    refreshRequirements();
+    const newRequirement = createRequirementStorage(description, effort);
+    setRequirements(prev => [...prev, newRequirement]);
   };
 
   const updateRequirement = (id: string, updates: Partial<Requirement>) => {
     updateRequirementStorage(id, updates);
-    refreshRequirements();
+    const updatedRequirements = getRequirements();
+    setRequirements(updatedRequirements);
   };
 
   const deleteRequirement = (id: string) => {
     deleteRequirementStorage(id);
-    refreshRequirements();
+    setRequirements(prev => prev.filter(req => req.id !== id));
   };
 
   const toggleStatus = (id: string) => {
     toggleRequirementStatusStorage(id);
-    refreshRequirements();
+    const updatedRequirements = getRequirements();
+    setRequirements(updatedRequirements);
   };
+
+  const totalActiveEffort = useMemo(() => {
+    return calculateTotalActiveEffort(requirements);
+  }, [requirements]);
 
   return {
     requirements,
@@ -67,6 +55,5 @@ export function useRequirements(): UseRequirementsReturn {
     deleteRequirement,
     toggleStatus,
     totalActiveEffort,
-    refreshRequirements,
   };
 }

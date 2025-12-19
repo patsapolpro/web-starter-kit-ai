@@ -26,7 +26,7 @@
 
 ### 1.1 Purpose
 
-The **Requirement & Effort Tracker MVP** is a client-side web application that enables users to quickly capture project requirements, assign effort values, and dynamically track the total effort of active requirements. The application is designed for simplicity, requiring no authentication and storing all data locally in the browser.
+The **Requirement & Effort Tracker MVP** is a full-stack web application that enables users to quickly capture project requirements, assign effort values, and dynamically track the total effort of active requirements. The application is designed for simplicity, requiring no authentication and storing all data in a PostgreSQL database for reliable, cross-device persistence.
 
 ### 1.2 Technology Stack
 
@@ -37,7 +37,12 @@ The **Requirement & Effort Tracker MVP** is a client-side web application that e
 | **Language** | TypeScript | 5+ | Type-safe JavaScript |
 | **Styling** | Tailwind CSS | v4 | Utility-first CSS framework |
 | **Build Tool** | Turbopack | Latest | Fast build system |
-| **Data Storage** | localStorage | Browser API | Client-side persistence |
+| **Database** | PostgreSQL | 15+ | Relational database |
+| **Database Client** | @vercel/postgres | Latest | PostgreSQL client for Vercel |
+| **ORM (Optional)** | Prisma | 5+ | Type-safe database ORM |
+| **API Layer** | Next.js API Routes | 15.5+ | Server-side API endpoints |
+| **Internationalization** | i18next | 23+ | i18n framework |
+| **i18n React Integration** | react-i18next | 14+ | React bindings for i18next |
 | **Package Manager** | npm | Latest | Dependency management |
 
 ### 1.3 Key Features
@@ -49,7 +54,13 @@ The **Requirement & Effort Tracker MVP** is a client-side web application that e
 - ✅ Active/Inactive status toggle
 - ✅ Real-time total effort calculation
 - ✅ Effort column visibility toggle
-- ✅ Local browser persistence
+- ✅ **PostgreSQL database persistence**
+- ✅ **Cross-device/browser data access**
+- ✅ **Transactional data integrity**
+- ✅ **Loading states for database operations**
+- ✅ **Robust error handling with retry mechanisms**
+- ✅ Internationalization (English and Thai language support)
+- ✅ Language preference persistence
 - ✅ Responsive design (mobile and desktop)
 - ✅ Form validation with inline error messages
 
@@ -61,11 +72,34 @@ The **Requirement & Effort Tracker MVP** is a client-side web application that e
 Node.js 20.x LTS or higher
 npm 10.x or higher
 Git 2.x or higher
+PostgreSQL 15.x or higher
 
 # Verify installations
 node --version
 npm --version
 git --version
+psql --version
+```
+
+**Database Setup:**
+```bash
+# Install PostgreSQL (if not installed)
+# macOS: brew install postgresql@15
+# Ubuntu: sudo apt-get install postgresql-15
+# Windows: Download from postgresql.org
+
+# Start PostgreSQL service
+# macOS: brew services start postgresql@15
+# Ubuntu: sudo systemctl start postgresql
+# Windows: Start via Services
+
+# Create database
+createdb req_tracker_dev
+
+# Or using psql
+psql -U postgres
+CREATE DATABASE req_tracker_dev;
+\q
 ```
 
 **Installation:**
@@ -76,6 +110,15 @@ cd web-starter-kit
 
 # Install dependencies
 npm install
+
+# Set up environment variables
+cp .env.example .env.local
+
+# Edit .env.local and add your database connection string
+# POSTGRES_URL="postgresql://user:password@localhost:5432/req_tracker_dev"
+
+# Run database migrations
+npm run db:migrate
 
 # Start development server
 npm run dev
@@ -97,6 +140,12 @@ npm start
 
 # Run linter
 npm run lint
+
+# Database commands
+npm run db:migrate      # Run database migrations
+npm run db:seed         # Seed database with test data
+npm run db:reset        # Reset database (drop and recreate)
+npm run db:studio       # Open Prisma Studio (if using Prisma)
 ```
 
 ---
@@ -109,13 +158,25 @@ npm run lint
 web-starter-kit/
 ├── src/                          # Source code directory
 │   ├── app/                      # Next.js App Router directory
+│   │   ├── api/                  # API Routes (Server-side endpoints)
+│   │   │   ├── project/
+│   │   │   │   ├── route.ts      # GET, POST project endpoints
+│   │   │   │   └── [id]/route.ts # PUT, DELETE project endpoints
+│   │   │   ├── requirements/
+│   │   │   │   ├── route.ts      # GET, POST requirements endpoints
+│   │   │   │   └── [id]/route.ts # GET, PUT, DELETE requirement by ID
+│   │   │   └── preferences/
+│   │   │       └── route.ts      # GET, PUT preferences endpoints
 │   │   ├── layout.tsx            # Root layout component
 │   │   ├── page.tsx              # Homepage/main application
+│   │   ├── providers.tsx         # Client-side providers (i18n)
 │   │   └── globals.css           # Global styles
 │   ├── components/               # React components (to be created)
 │   │   ├── ProjectHeader/
 │   │   │   ├── ProjectHeader.tsx
 │   │   │   └── ProjectNameEdit.tsx
+│   │   ├── LanguageToggle/
+│   │   │   └── LanguageToggle.tsx
 │   │   ├── RequirementForm/
 │   │   │   ├── RequirementForm.tsx
 │   │   │   └── FormValidation.ts
@@ -135,35 +196,54 @@ web-starter-kit/
 │   │       ├── Toggle.tsx
 │   │       └── Modal.tsx
 │   ├── lib/                      # Utility functions and services
-│   │   ├── storage/
-│   │   │   ├── localStorage.ts   # localStorage wrapper
-│   │   │   ├── project.ts        # Project data operations
-│   │   │   ├── requirements.ts   # Requirements data operations
-│   │   │   └── preferences.ts    # User preferences operations
+│   │   ├── db/
+│   │   │   ├── index.ts          # Database connection and client
+│   │   │   ├── schema.sql        # Database schema definition
+│   │   │   └── migrations/       # Database migration files
+│   │   ├── api/
+│   │   │   ├── client.ts         # API client for frontend
+│   │   │   └── types.ts          # API request/response types
+│   │   ├── repositories/
+│   │   │   ├── projectRepository.ts    # Project database operations
+│   │   │   ├── requirementRepository.ts # Requirements database operations
+│   │   │   └── preferenceRepository.ts  # Preferences database operations
+│   │   ├── i18n/
+│   │   │   ├── config.ts         # i18next configuration
+│   │   │   └── locales/
+│   │   │       ├── en.json       # English translations
+│   │   │       └── th.json       # Thai translations
 │   │   ├── validation/
 │   │   │   ├── projectValidation.ts
 │   │   │   └── requirementValidation.ts
 │   │   └── utils/
 │   │       ├── calculations.ts   # Effort calculation utilities
-│   │       └── formatters.ts     # Date/number formatting
+│   │       ├── formatters.ts     # Date/number formatting
+│   │       └── errorHandler.ts   # Error handling utilities
 │   ├── types/                    # TypeScript type definitions
 │   │   ├── project.ts
 │   │   ├── requirement.ts
 │   │   └── preferences.ts
 │   └── hooks/                    # Custom React hooks
-│       ├── useLocalStorage.ts
 │       ├── useProject.ts
 │       ├── useRequirements.ts
-│       └── usePreferences.ts
+│       ├── usePreferences.ts
+│       ├── useLanguage.ts
+│       └── useAsync.ts           # Generic async hook for API calls
+├── prisma/                       # Prisma ORM files (if using Prisma)
+│   ├── schema.prisma             # Prisma schema definition
+│   └── migrations/               # Prisma migrations
 ├── public/                       # Static assets
 │   └── (static files)
 ├── docs/                         # Documentation
 │   ├── requirement.md
+│   ├── requirement-2.md          # PostgreSQL migration requirements
 │   ├── data-schema.md
 │   ├── architecture.md
 │   └── technical-spec.md
 ├── ui-prototypes/                # HTML mockups
 │   └── (prototype files)
+├── .env.example                  # Environment variables template
+├── .env.local                    # Local environment variables (gitignored)
 ├── next.config.ts                # Next.js configuration
 ├── tsconfig.json                 # TypeScript configuration
 ├── postcss.config.mjs            # PostCSS configuration
@@ -176,10 +256,15 @@ web-starter-kit/
 
 #### 2.2.1 App Directory (`src/app/`)
 
-**Purpose:** Next.js App Router pages and layouts
+**Purpose:** Next.js App Router pages, layouts, and API routes
 
+- `api/`: Server-side API routes for database operations
+  - `project/route.ts`: Project CRUD endpoints
+  - `requirements/route.ts`: Requirements CRUD endpoints
+  - `preferences/route.ts`: Preferences endpoints
 - `layout.tsx`: Root layout with font configuration and global styles
 - `page.tsx`: Main application page component
+- `providers.tsx`: Client-side providers (i18n context)
 - `globals.css`: Global CSS with Tailwind imports and theme configuration
 
 #### 2.2.2 Components Directory (`src/components/`)
@@ -189,6 +274,7 @@ web-starter-kit/
 | Component Group | Responsibility | Components |
 |----------------|----------------|------------|
 | **ProjectHeader/** | Project name display and editing | ProjectHeader, ProjectNameEdit |
+| **LanguageToggle/** | Language selection UI | LanguageToggle |
 | **RequirementForm/** | Adding new requirements | RequirementForm, FormValidation |
 | **RequirementsList/** | Displaying and managing requirements | RequirementsList, RequirementRow, RequirementEditRow, EmptyState |
 | **TotalEffort/** | Displaying total active effort | TotalEffortCard |
@@ -201,9 +287,12 @@ web-starter-kit/
 
 | Subdirectory | Responsibility | Files |
 |-------------|----------------|-------|
-| **storage/** | localStorage operations | localStorage.ts, project.ts, requirements.ts, preferences.ts |
+| **db/** | Database connection and configuration | index.ts, schema.sql, migrations/ |
+| **api/** | API client for frontend | client.ts, types.ts |
+| **repositories/** | Database data access layer | projectRepository.ts, requirementRepository.ts, preferenceRepository.ts |
+| **i18n/** | Internationalization configuration and translations | config.ts, locales/en.json, locales/th.json |
 | **validation/** | Input validation logic | projectValidation.ts, requirementValidation.ts |
-| **utils/** | Helper functions | calculations.ts, formatters.ts |
+| **utils/** | Helper functions | calculations.ts, formatters.ts, errorHandler.ts |
 
 #### 2.2.4 Types Directory (`src/types/`)
 
@@ -215,145 +304,234 @@ web-starter-kit/
 
 #### 2.2.5 Hooks Directory (`src/hooks/`)
 
-**Purpose:** Custom React hooks for state management
+**Purpose:** Custom React hooks for state management and API interaction
 
-- `useLocalStorage.ts`: Generic localStorage hook
-- `useProject.ts`: Project data management
-- `useRequirements.ts`: Requirements CRUD operations
-- `usePreferences.ts`: User preferences management
+- `useProject.ts`: Project data management with API calls
+- `useRequirements.ts`: Requirements CRUD operations with API calls
+- `usePreferences.ts`: User preferences management with API calls
+- `useLanguage.ts`: Language selection and i18n hook
+- `useAsync.ts`: Generic async hook for API calls with loading/error states
 
 ---
 
 ## 3. API Specifications
 
-Since this is a **client-side only application**, there are no backend API endpoints. Instead, all data operations use the browser's **localStorage API**. The following sections define the data operations as if they were API endpoints.
+This application uses a **REST API** architecture with Next.js API Routes handling server-side database operations. All endpoints return JSON responses and follow REST conventions.
 
-### 3.1 localStorage Storage Keys
+### 3.1 API Base URL
 
-**Namespace:** `req-tracker`
+**Development:** `http://localhost:3000/api`
+**Production:** `https://your-domain.com/api`
 
-| Storage Key | Data Type | Description |
-|------------|-----------|-------------|
-| `req-tracker:schema-version` | string | Schema version for migrations |
-| `req-tracker:project` | JSON (Project) | Project metadata |
-| `req-tracker:requirements` | JSON (Requirement[]) | Array of requirements |
-| `req-tracker:preferences` | JSON (UserPreferences) | User display preferences |
+### 3.2 API Response Format
 
-### 3.2 Data Operations
-
-#### 3.2.1 Project Operations
-
-##### Get Project
-
-**Function Signature:**
+**Success Response:**
 ```typescript
-function getProject(): Project | null
-```
-
-**Description:** Retrieves the current project from localStorage
-
-**Request Parameters:** None
-
-**Response:**
-```typescript
-// Success
 {
-  name: string;
-  createdAt: string; // ISO 8601
-  lastModifiedAt: string; // ISO 8601
+  success: true,
+  data: T // Response data
 }
-
-// Empty state
-null
 ```
 
-**Error Handling:**
-- Returns `null` if no project exists
-- Returns `null` if JSON parsing fails
-- Logs error to console on failure
-
-**Example:**
+**Error Response:**
 ```typescript
-const project = getProject();
-if (project) {
-  console.log(`Project: ${project.name}`);
+{
+  success: false,
+  error: {
+    code: string,      // Error code (e.g., "VALIDATION_ERROR", "DATABASE_ERROR")
+    message: string,   // User-friendly error message
+    details?: any      // Optional detailed error information
+  }
+}
+```
+
+### 3.3 Error Codes
+
+| Code | HTTP Status | Description |
+|------|-------------|-------------|
+| `VALIDATION_ERROR` | 400 | Invalid input data |
+| `NOT_FOUND` | 404 | Resource not found |
+| `DATABASE_ERROR` | 500 | Database operation failed |
+| `CONNECTION_ERROR` | 503 | Database connection failed |
+| `INTERNAL_ERROR` | 500 | Internal server error |
+
+### 3.4 API Endpoints
+
+#### 3.4.1 Project Operations
+
+##### GET /api/project - Get Project
+
+**Description:** Retrieves the current project from database
+
+**HTTP Method:** GET
+
+**Request:** No body required
+
+**Response (200 OK):**
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "name": "E-commerce Platform",
+    "createdAt": "2025-12-19T10:00:00.000Z",
+    "lastModifiedAt": "2025-12-19T10:00:00.000Z"
+  }
+}
+```
+
+**Response (404 Not Found - No project exists):**
+```json
+{
+  "success": false,
+  "error": {
+    "code": "NOT_FOUND",
+    "message": "No project found"
+  }
+}
+```
+
+**Example Usage:**
+```typescript
+const response = await fetch('/api/project');
+const result = await response.json();
+if (result.success) {
+  console.log('Project:', result.data);
 }
 ```
 
 ---
 
-##### Create Project
+##### POST /api/project - Create Project
 
-**Function Signature:**
-```typescript
-function createProject(name: string): Project
-```
+**Description:** Creates a new project in the database
 
-**Description:** Creates a new project and saves to localStorage
+**HTTP Method:** POST
 
-**Request Parameters:**
-| Parameter | Type | Required | Validation |
-|-----------|------|----------|------------|
-| `name` | string | Yes | 1-100 chars, trimmed |
-
-**Response:**
-```typescript
+**Request Body:**
+```json
 {
-  name: string;
-  createdAt: string;
-  lastModifiedAt: string;
+  "name": "E-commerce Platform"
 }
 ```
+
+**Request Parameters:**
+| Field | Type | Required | Validation |
+|-------|------|----------|------------|
+| `name` | string | Yes | 1-100 chars, trimmed |
 
 **Validation Rules:**
 - If `name` is empty after trimming, defaults to "Untitled Project"
 - Maximum length: 100 characters
 - Whitespace-only strings treated as empty
 
-**Side Effects:**
-- Writes to localStorage key: `req-tracker:project`
-- Updates `createdAt` and `lastModifiedAt` timestamps
+**Response (201 Created):**
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "name": "E-commerce Platform",
+    "createdAt": "2025-12-19T10:00:00.000Z",
+    "lastModifiedAt": "2025-12-19T10:00:00.000Z"
+  }
+}
+```
 
-**Example:**
+**Response (400 Bad Request - Validation Error):**
+```json
+{
+  "success": false,
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Project name must not exceed 100 characters"
+  }
+}
+```
+
+**Response (500 Internal Server Error - Database Error):**
+```json
+{
+  "success": false,
+  "error": {
+    "code": "DATABASE_ERROR",
+    "message": "Unable to create project. Please try again."
+  }
+}
+```
+
+**Example Usage:**
 ```typescript
-const project = createProject("E-commerce Platform");
-// Result: { name: "E-commerce Platform", createdAt: "2025-12-19T...", ... }
+const response = await fetch('/api/project', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ name: 'E-commerce Platform' })
+});
+const result = await response.json();
 ```
 
 ---
 
-##### Update Project Name
+##### PUT /api/project - Update Project Name
 
-**Function Signature:**
-```typescript
-function updateProjectName(newName: string): void
+**Description:** Updates the project name in the database
+
+**HTTP Method:** PUT
+
+**Request Body:**
+```json
+{
+  "name": "Mobile App Development"
+}
 ```
 
-**Description:** Updates the project name
-
 **Request Parameters:**
-| Parameter | Type | Required | Validation |
-|-----------|------|----------|------------|
-| `newName` | string | Yes | 1-100 chars, trimmed |
+| Field | Type | Required | Validation |
+|-------|------|----------|------------|
+| `name` | string | Yes | 1-100 chars, trimmed |
 
-**Response:** void (no return value)
+**Response (200 OK):**
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "name": "Mobile App Development",
+    "createdAt": "2025-12-19T10:00:00.000Z",
+    "lastModifiedAt": "2025-12-19T15:30:00.000Z"
+  }
+}
+```
 
-**Validation Rules:**
-- Same as createProject
-- If validation fails, no changes are saved
+**Response (404 Not Found):**
+```json
+{
+  "success": false,
+  "error": {
+    "code": "NOT_FOUND",
+    "message": "Project not found"
+  }
+}
+```
 
-**Side Effects:**
-- Updates `req-tracker:project` in localStorage
-- Updates `lastModifiedAt` timestamp
-- Preserves `createdAt` timestamp
+**Response (400 Bad Request):**
+```json
+{
+  "success": false,
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Project name must not exceed 100 characters"
+  }
+}
+```
 
-**Error Handling:**
-- Silent failure if project doesn't exist
-- No error thrown, operation is skipped
-
-**Example:**
+**Example Usage:**
 ```typescript
-updateProjectName("Mobile App Development");
+const response = await fetch('/api/project', {
+  method: 'PUT',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ name: 'Mobile App Development' })
+});
 ```
 
 ---
@@ -734,7 +912,95 @@ updatePreferences({ effortColumnVisible: false });
 
 ---
 
-#### 3.2.4 Clear All Data
+#### 3.2.4 Language/i18n Operations
+
+##### Get Current Language
+
+**Function Signature:**
+```typescript
+function getCurrentLanguage(): string
+```
+
+**Description:** Retrieves the current language from i18next
+
+**Request Parameters:** None
+
+**Response:**
+```typescript
+'en' | 'th' // Current language code
+```
+
+**Example:**
+```typescript
+const currentLanguage = i18n.language;
+// Result: 'en' or 'th'
+```
+
+---
+
+##### Change Language
+
+**Function Signature:**
+```typescript
+function changeLanguage(language: 'en' | 'th'): void
+```
+
+**Description:** Changes the application language and saves to localStorage
+
+**Request Parameters:**
+| Parameter | Type | Required |
+|-----------|------|----------|
+| `language` | 'en' \| 'th' | Yes |
+
+**Response:** void
+
+**Side Effects:**
+- Updates i18n language state
+- Saves to localStorage key: `app-language`
+- Triggers re-render of all translated components
+- Fires 'languageChanged' event
+
+**Example:**
+```typescript
+changeLanguage('th');
+// All UI text immediately updates to Thai
+```
+
+---
+
+##### Get Translation
+
+**Function Signature:**
+```typescript
+function t(key: string, options?: object): string
+```
+
+**Description:** Retrieves translated text for a given key
+
+**Request Parameters:**
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `key` | string | Yes | Translation key (e.g., 'app.title') |
+| `options` | object | No | Interpolation options |
+
+**Response:**
+```typescript
+string // Translated text
+```
+
+**Example:**
+```typescript
+const title = t('app.title');
+// English: "Requirement & Effort Tracker"
+// Thai: "ระบบติดตามความต้องการและความพยายาม"
+
+const count = t('requirements.totalRequirements', { count: 5 });
+// "5 total requirements" / "5 ความต้องการทั้งหมด"
+```
+
+---
+
+#### 3.2.5 Clear All Data
 
 **Function Signature:**
 ```typescript
@@ -1572,7 +1838,29 @@ interface ProjectHeaderProps {
 
 ---
 
-#### 7.1.2 RequirementForm Component
+#### 7.1.2 LanguageToggle Component
+
+```typescript
+interface LanguageToggleProps {
+  // No props needed - uses useLanguage hook internally
+}
+```
+
+**Usage:**
+```tsx
+<LanguageToggle />
+```
+
+**Notes:**
+- Self-contained component
+- Manages its own dropdown state
+- Uses `useLanguage` hook for language operations
+- Displays current language with flag and name
+- Shows dropdown menu on click
+
+---
+
+#### 7.1.3 RequirementForm Component
 
 ```typescript
 interface RequirementFormProps {
@@ -1589,7 +1877,7 @@ interface RequirementFormProps {
 
 ---
 
-#### 7.1.3 RequirementsList Component
+#### 7.1.4 RequirementsList Component
 
 ```typescript
 interface RequirementsListProps {
@@ -1616,7 +1904,7 @@ interface RequirementsListProps {
 
 ---
 
-#### 7.1.4 RequirementRow Component
+#### 7.1.5 RequirementRow Component
 
 ```typescript
 interface RequirementRowProps {
@@ -1631,7 +1919,7 @@ interface RequirementRowProps {
 
 ---
 
-#### 7.1.5 TotalEffortCard Component
+#### 7.1.6 TotalEffortCard Component
 
 ```typescript
 interface TotalEffortCardProps {
@@ -1650,7 +1938,7 @@ interface TotalEffortCardProps {
 
 ---
 
-#### 7.1.6 Modal Components
+#### 7.1.7 Modal Components
 
 ```typescript
 interface ConfirmationModalProps {
@@ -1747,6 +2035,36 @@ const { preferences, updatePreferences } = usePreferences();
 updatePreferences({
   effortColumnVisible: !preferences.effortColumnVisible
 });
+```
+
+---
+
+#### 7.2.4 useLanguage Hook
+
+```typescript
+export type Language = 'en' | 'th';
+
+interface UseLanguageReturn {
+  t: (key: string, options?: object) => string;
+  currentLanguage: Language;
+  changeLanguage: (language: Language) => void;
+}
+
+function useLanguage(): UseLanguageReturn;
+```
+
+**Example:**
+```typescript
+const { t, currentLanguage, changeLanguage } = useLanguage();
+
+// Get translated text
+const title = t('app.title');
+
+// Check current language
+console.log(currentLanguage); // 'en' or 'th'
+
+// Change language
+changeLanguage('th');
 ```
 
 ---
@@ -2522,6 +2840,10 @@ describe('validateEffort', () => {
 | **TypeScript** | Typed superset of JavaScript |
 | **UUID** | Universally Unique Identifier |
 | **ISO 8601** | International standard for date/time format |
+| **i18n** | Internationalization - process of designing software for multiple languages |
+| **i18next** | JavaScript internationalization framework |
+| **Locale** | Language and region-specific settings |
+| **Translation Key** | Unique identifier for translatable text (e.g., 'app.title') |
 
 ---
 
@@ -2532,6 +2854,8 @@ describe('validateEffort', () => {
 - React: https://react.dev
 - TypeScript: https://www.typescriptlang.org/docs
 - Tailwind CSS: https://tailwindcss.com/docs
+- i18next: https://www.i18next.com/
+- react-i18next: https://react.i18next.com/
 - MDN Web APIs: https://developer.mozilla.org/en-US/docs/Web/API
 
 **Project Documentation:**
@@ -2547,6 +2871,7 @@ describe('validateEffort', () => {
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
 | 1.0 | 2025-12-19 | Development Team | Initial comprehensive technical specification |
+| 1.1 | 2025-12-19 | Development Team | Added internationalization (i18n) support for English and Thai languages |
 
 ---
 

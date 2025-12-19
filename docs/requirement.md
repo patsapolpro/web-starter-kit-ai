@@ -354,18 +354,75 @@ This document specifies the functional requirements for the Requirement & Effort
 
 ---
 
-## 7. Data Management Operations
+## 7. Internationalization (i18n)
 
-### FR.16 Initial Application State
+### FR.18 Multi-Language Support
+**User Story**: As a user, I want to switch between English and Thai languages, so I can use the application in my preferred language.
+
+**Functional Requirements**:
+- FR.18.1: The application shall support both English (EN) and Thai (TH) languages
+- FR.18.2: The application shall provide a language toggle control in the header
+- FR.18.3: The language toggle shall display:
+  - Current language flag and name
+  - A dropdown menu with all available languages
+  - Visual indication of the currently selected language
+- FR.18.4: Clicking a language option shall immediately switch all UI text to the selected language
+- FR.18.5: The selected language preference shall be saved to browser local storage
+- FR.18.6: When the application loads, it shall restore the last selected language
+- FR.18.7: If no language preference is saved, the application shall default to English
+
+**Translated Content**:
+All user-facing text shall be translatable, including:
+- Application title and subtitle
+- Project setup screen
+- Header buttons and labels
+- Requirements list headers and empty states
+- Form labels, placeholders, and buttons
+- Effort summary section
+- Modal dialogs (delete, clear all)
+- Validation error messages
+- Status indicators (Active/Inactive)
+
+**Acceptance Criteria**:
+- A language toggle control is visible in the application header
+- Clicking the toggle shows a dropdown with English and Thai options
+- Selecting a language immediately updates all UI text
+- The language preference persists across browser sessions
+- All user-facing text is properly translated in both languages
+- No hardcoded text strings remain in components
+- Thai text displays correctly with proper character encoding
+
+---
+
+### FR.19 Language Preference Persistence
+**User Story**: As a user, I want my language preference to be remembered, so I don't have to change it every time I visit.
+
+**Functional Requirements**:
+- FR.19.1: The application shall save the selected language to localStorage key: `app-language`
+- FR.19.2: The language preference shall be saved immediately when changed
+- FR.19.3: On application load, the saved language shall be restored automatically
+- FR.19.4: If the localStorage key is cleared, the application shall default to English
+
+**Acceptance Criteria**:
+- Language selection is saved immediately
+- Closing and reopening the browser preserves the language choice
+- Refreshing the page maintains the current language
+- Clearing browser storage resets to English default
+
+---
+
+## 8. Data Management Operations
+
+### FR.20 Initial Application State
 **User Story**: As a first-time user, I want to understand what the application does and how to get started.
 
 **Functional Requirements**:
-- FR.16.1: When the application is opened for the first time (no saved data), it shall display:
+- FR.20.1: When the application is opened for the first time (no saved data), it shall display:
   - A prompt to enter a project name
   - An empty requirements list
   - A message: "No requirements yet. Add your first requirement above."
   - The total effort displaying as 0
-- FR.16.2: The add requirement form shall be visible and ready for input
+- FR.20.2: The add requirement form shall be visible and ready for input
 
 **Acceptance Criteria**:
 - First-time users see a clear, welcoming interface
@@ -375,20 +432,20 @@ This document specifies the functional requirements for the Requirement & Effort
 
 ---
 
-### FR.17 Clearing All Data
+### FR.21 Clearing All Data
 **User Story**: As a user, I want to clear all project data and start fresh, so I can begin a new project.
 
 **Functional Requirements**:
-- FR.17.1: The application shall provide a "Clear All Data" or "New Project" action
-- FR.17.2: This action shall be accessible from the main interface but not prominently positioned (to avoid accidental clicks)
-- FR.17.3: Clicking this action shall display a confirmation prompt: "Are you sure you want to clear all data? This action cannot be undone."
-- FR.17.4: The confirmation shall provide "Clear All" and "Cancel" options
-- FR.17.5: Confirming shall:
+- FR.21.1: The application shall provide a "Clear All Data" or "New Project" action
+- FR.21.2: This action shall be accessible from the main interface but not prominently positioned (to avoid accidental clicks)
+- FR.21.3: Clicking this action shall display a confirmation prompt: "Are you sure you want to clear all data? This action cannot be undone."
+- FR.21.4: The confirmation shall provide "Clear All" and "Cancel" options
+- FR.21.5: Confirming shall:
   - Delete all requirements
   - Reset the project name to "Untitled Project" or prompt for a new project name
   - Clear all data from local storage
   - Return the application to its initial state
-- FR.17.6: Canceling shall dismiss the prompt without any changes
+- FR.21.6: Canceling shall dismiss the prompt without any changes
 
 **Acceptance Criteria**:
 - A clear data option is available but not accidentally clickable
@@ -399,20 +456,22 @@ This document specifies the functional requirements for the Requirement & Effort
 
 ---
 
-## 8. User Workflow Summary
+## 9. User Workflow Summary
 
-### 8.1 Primary User Journey
+### 9.1 Primary User Journey
 1. User opens the application (no authentication required)
 2. User is prompted to name their project
-3. User adds requirements with descriptions and effort values
-4. Requirements appear in a list, all active by default
-5. User can toggle requirements active/inactive to control scope
-6. Total effort updates automatically based on active requirements
-7. User can edit or delete requirements as needed
-8. User can hide effort column during discussions
-9. All changes are automatically saved to browser storage
+3. User can select their preferred language (English or Thai)
+4. User adds requirements with descriptions and effort values
+5. Requirements appear in a list, all active by default
+6. User can toggle requirements active/inactive to control scope
+7. Total effort updates automatically based on active requirements
+8. User can edit or delete requirements as needed
+9. User can hide effort column during discussions
+10. User can switch language at any time
+11. All changes are automatically saved to browser storage
 
-### 8.2 Edge Cases and Error Scenarios
+### 9.2 Edge Cases and Error Scenarios
 - **Empty requirement description**: User receives validation error and cannot add until corrected
 - **Invalid effort value**: User receives validation error specific to the validation rule violated
 - **No active requirements**: Total effort displays as 0
@@ -422,13 +481,13 @@ This document specifies the functional requirements for the Requirement & Effort
 
 ---
 
-## 9. Data Requirements
+## 10. Data Requirements
 
-### 9.1 Project Data
+### 10.1 Project Data
 - **Project Name**: String, 1-100 characters, required
 - **Created Date**: Timestamp of project creation (for future use)
 
-### 9.2 Requirement Data
+### 10.2 Requirement Data
 Each requirement record contains:
 - **ID**: Unique identifier (string or number)
 - **Description**: String, 1-500 characters, required
@@ -437,15 +496,16 @@ Each requirement record contains:
 - **Created Date**: Timestamp of requirement creation
 - **Last Modified Date**: Timestamp of last edit
 
-### 9.3 User Preferences
+### 10.3 User Preferences
 - **Effort Column Visible**: Boolean, default true
 - **Total Effort Summary Visible When Column Hidden**: Boolean, default true
+- **Language Preference**: String ('en' or 'th'), default 'en'
 
 ---
 
-## 10. Acceptance Testing Scenarios
+## 11. Acceptance Testing Scenarios
 
-### 10.1 Basic Requirement Management
+### 11.1 Basic Requirement Management
 **Scenario**: Add, edit, and delete a requirement
 1. Open the application and create a project named "Test Project"
 2. Add a requirement: "User login feature", Effort: 5
@@ -457,7 +517,7 @@ Each requirement record contains:
 8. Delete the requirement with confirmation
 9. Verify requirement is removed and total effort shows 0
 
-### 10.2 Status Toggle and Calculation
+### 11.2 Status Toggle and Calculation
 **Scenario**: Toggle requirement status and observe total effort changes
 1. Add three requirements with efforts: 5, 10, 15 (all active)
 2. Verify total effort shows 30
@@ -468,7 +528,7 @@ Each requirement record contains:
 7. Verify total effort shows 30 again
 8. Verify the requirement returns to normal appearance
 
-### 10.3 Data Persistence
+### 11.3 Data Persistence
 **Scenario**: Verify data persists across browser sessions
 1. Add multiple requirements with various effort values and statuses
 2. Note the total effort value
@@ -478,7 +538,7 @@ Each requirement record contains:
 6. Verify all statuses are preserved
 7. Verify total effort is correct
 
-### 10.4 Input Validation
+### 11.4 Input Validation
 **Scenario**: Test validation for invalid inputs
 1. Attempt to add a requirement with empty description
 2. Verify error message appears: "Requirement description is required"
@@ -490,7 +550,7 @@ Each requirement record contains:
 8. Verify error message appears: "Effort must be a number"
 9. Enter valid data and verify requirement is added successfully
 
-### 10.5 Effort Column Visibility
+### 11.5 Effort Column Visibility
 **Scenario**: Toggle effort column visibility
 1. Verify effort column is visible by default
 2. Click "Hide Effort" control
@@ -501,9 +561,23 @@ Each requirement record contains:
 7. Click "Show Effort" control
 8. Verify effort column reappears
 
+### 11.6 Language Switching
+**Scenario**: Test language switching functionality
+1. Verify application loads in English by default (first time use)
+2. Click the language toggle in the header
+3. Verify dropdown shows English and Thai options
+4. Select Thai language
+5. Verify all UI text immediately changes to Thai
+6. Refresh the browser
+7. Verify the application still displays in Thai
+8. Switch back to English
+9. Verify all UI text changes back to English
+10. Close and reopen the browser
+11. Verify the selected language (English) is preserved
+
 ---
 
-## 11. Glossary
+## 12. Glossary
 
 - **Requirement**: A text description of a feature, task, or deliverable in a project
 - **Effort**: A numeric value representing the estimated work required for a requirement
@@ -512,14 +586,18 @@ Each requirement record contains:
 - **Total Effort**: The sum of effort values from all requirements with Active status
 - **Local Storage**: Browser-based storage mechanism for persisting data locally
 - **MVP**: Minimum Viable Product - the most basic version with core functionality
+- **i18n**: Internationalization - the process of designing software to support multiple languages
+- **Locale**: A set of parameters that defines the user's language, region, and language preferences
+- **Translation**: Text content in different languages for the same UI elements
 
 ---
 
-## 12. Document Revision History
+## 13. Document Revision History
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
 | 1.0 | 2025-12-19 | AI Assistant | Initial comprehensive functional requirements document |
+| 1.1 | 2025-12-19 | AI Assistant | Added internationalization (i18n) support for English and Thai languages |
 
 ---
 
@@ -545,6 +623,13 @@ Each requirement record contains:
 17. Added character limits for text fields
 18. Added decimal value support for effort
 19. Added maximum effort value constraint (1000)
+20. Added FR.18: Multi-language support (English and Thai)
+21. Added FR.19: Language preference persistence
+22. Added language toggle component in header
+23. Added comprehensive i18n test scenario (Section 11.6)
+24. Updated user workflow to include language selection
+25. Added i18n-related terms to glossary
+26. Updated data requirements to include language preference
 
 ### Clarifications:
 1. Separated functional requirements (FR) from non-functional requirements (moved NF items out)

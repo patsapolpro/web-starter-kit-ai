@@ -6,31 +6,23 @@ import { getItem, setItem } from './localStorage';
  * Get project from localStorage
  */
 export function getProject(): Project | null {
-  const data = getItem(STORAGE_KEYS.PROJECT);
-  if (!data) return null;
-
-  try {
-    return JSON.parse(data) as Project;
-  } catch (error) {
-    console.error('Failed to parse project data:', error);
-    return null;
-  }
+  return getItem<Project>(STORAGE_KEYS.PROJECT);
 }
 
 /**
- * Create a new project and save to localStorage
+ * Create a new project
  */
 export function createProject(name: string): Project {
-  const now = new Date().toISOString();
   const trimmedName = name.trim();
+  const projectName = trimmedName || DEFAULTS.PROJECT_NAME;
 
   const project: Project = {
-    name: trimmedName || DEFAULTS.PROJECT_NAME,
-    createdAt: now,
-    lastModifiedAt: now,
+    name: projectName,
+    createdAt: new Date().toISOString(),
+    lastModifiedAt: new Date().toISOString(),
   };
 
-  setItem(STORAGE_KEYS.PROJECT, JSON.stringify(project));
+  setItem(STORAGE_KEYS.PROJECT, project);
   return project;
 }
 
@@ -42,8 +34,10 @@ export function updateProjectName(newName: string): void {
   if (!project) return;
 
   const trimmedName = newName.trim();
-  project.name = trimmedName || DEFAULTS.PROJECT_NAME;
+  if (!trimmedName) return;
+
+  project.name = trimmedName;
   project.lastModifiedAt = new Date().toISOString();
 
-  setItem(STORAGE_KEYS.PROJECT, JSON.stringify(project));
+  setItem(STORAGE_KEYS.PROJECT, project);
 }

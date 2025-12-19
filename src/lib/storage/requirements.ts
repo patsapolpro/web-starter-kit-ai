@@ -1,20 +1,19 @@
 import type { Requirement } from '@/types/requirement';
-import { STORAGE_KEYS, DEFAULTS } from '@/lib/constants';
+import { STORAGE_KEYS } from '@/lib/constants';
 import { getItem, setItem } from './localStorage';
 
 /**
  * Get all requirements from localStorage
  */
 export function getRequirements(): Requirement[] {
-  const data = getItem(STORAGE_KEYS.REQUIREMENTS);
-  if (!data) return [];
+  return getItem<Requirement[]>(STORAGE_KEYS.REQUIREMENTS) || [];
+}
 
-  try {
-    return JSON.parse(data) as Requirement[];
-  } catch (error) {
-    console.error('Failed to parse requirements data:', error);
-    return [];
-  }
+/**
+ * Save requirements to localStorage
+ */
+function saveRequirements(requirements: Requirement[]): void {
+  setItem(STORAGE_KEYS.REQUIREMENTS, requirements);
 }
 
 /**
@@ -22,27 +21,26 @@ export function getRequirements(): Requirement[] {
  */
 export function getRequirementById(id: string): Requirement | null {
   const requirements = getRequirements();
-  return requirements.find((req) => req.id === id) || null;
+  return requirements.find(req => req.id === id) || null;
 }
 
 /**
- * Create a new requirement and save to localStorage
+ * Create a new requirement
  */
 export function createRequirement(description: string, effort: number): Requirement {
-  const now = new Date().toISOString();
+  const requirements = getRequirements();
 
   const requirement: Requirement = {
     id: crypto.randomUUID(),
     description: description.trim(),
     effort: effort,
-    isActive: DEFAULTS.REQUIREMENT_STATUS,
-    createdAt: now,
-    lastModifiedAt: now,
+    isActive: true,
+    createdAt: new Date().toISOString(),
+    lastModifiedAt: new Date().toISOString(),
   };
 
-  const requirements = getRequirements();
   requirements.push(requirement);
-  setItem(STORAGE_KEYS.REQUIREMENTS, JSON.stringify(requirements));
+  saveRequirements(requirements);
 
   return requirement;
 }
@@ -52,34 +50,43 @@ export function createRequirement(description: string, effort: number): Requirem
  */
 export function updateRequirement(id: string, updates: Partial<Requirement>): void {
   const requirements = getRequirements();
-  const index = requirements.findIndex((req) => req.id === id);
+  const index = requirements.findIndex(req => req.id === id);
 
   if (index === -1) return;
 
-  requirements[index] = {
-    ...requirements[index],
-    ...updates,
-    id: requirements[index].id, // Prevent ID change
-    createdAt: requirements[index].createdAt, // Prevent createdAt change
-    lastModifiedAt: new Date().toISOString(),
-  };
+  const requirement = requirements[index];
 
-  setItem(STORAGE_KEYS.REQUIREMENTS, JSON.stringify(requirements));
+  // Apply updates
+  if (updates.description !== undefined) {
+    requirement.description = updates.description.trim();
+  }
+  if (updates.effort !== undefined) {
+    requirement.effort = updates.effort;
+  }
+  if (updates.isActive !== undefined) {
+    requirement.isActive = updates.isActive;
+  }
+
+  // Update timestamp
+  requirement.lastModifiedAt = new Date().toISOString();
+
+  requirements[index] = requirement;
+  saveRequirements(requirements);
 }
 
 /**
- * Toggle requirement status (active/inactive)
+ * Toggle requirement active status
  */
 export function toggleRequirementStatus(id: string): void {
   const requirements = getRequirements();
-  const index = requirements.findIndex((req) => req.id === id);
+  const requirement = requirements.find(req => req.id === id);
 
-  if (index === -1) return;
+  if (!requirement) return;
 
-  requirements[index].isActive = !requirements[index].isActive;
-  requirements[index].lastModifiedAt = new Date().toISOString();
+  requirement.isActive = !requirement.isActive;
+  requirement.lastModifiedAt = new Date().toISOString();
 
-  setItem(STORAGE_KEYS.REQUIREMENTS, JSON.stringify(requirements));
+  saveRequirements(requirements);
 }
 
 /**
@@ -87,21 +94,13 @@ export function toggleRequirementStatus(id: string): void {
  */
 export function deleteRequirement(id: string): void {
   const requirements = getRequirements();
-  const filtered = requirements.filter((req) => req.id !== id);
-
-  setItem(STORAGE_KEYS.REQUIREMENTS, JSON.stringify(filtered));
+  const filtered = requirements.filter(req => req.id !== id);
+  saveRequirements(filtered);
 }
 
 /**
- * Calculate total active effort
+ * Clear all requirements
  */
-export function calculateTotalActiveEffort(): number {
-  const requirements = getRequirements();
-
-  const total = requirements
-    .filter((req) => req.isActive)
-    .reduce((sum, req) => sum + req.effort, 0);
-
-  // Round to 2 decimal places to avoid floating point precision issues
-  return Math.round(total * 100) / 100;
+export function clearAllRequirements(): void {
+  saveRequirements([]);
 }

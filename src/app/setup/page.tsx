@@ -1,138 +1,121 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { createProject } from '@/lib/storage/project';
+import { Input } from '@/components/UI/Input';
+import { Button } from '@/components/UI/Button';
 import { validateProjectName } from '@/lib/validation/projectValidation';
+import { createProject, getProject } from '@/lib/storage/project';
+import { useLanguage } from '@/hooks/useLanguage';
+import { LanguageToggle } from '@/components/LanguageToggle/LanguageToggle';
 
-export default function Setup() {
+export default function SetupPage() {
   const router = useRouter();
+  const { t } = useLanguage();
   const [projectName, setProjectName] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  useEffect(() => {
+    // Check if project already exists, redirect to dashboard
+    const existingProject = getProject();
+    if (existingProject) {
+      router.push('/');
+    }
+  }, [router]);
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
 
-    const trimmedName = projectName.trim();
-
-    // Validate project name
-    const validation = validateProjectName(trimmedName);
-    if (!validation.valid && trimmedName.length > 0) {
+    // Validate
+    const validation = validateProjectName(projectName);
+    if (!validation.valid) {
       setError(validation.error || '');
       return;
     }
 
-    // Create project with name or default
-    const finalName = trimmedName || '';
-    createProject(finalName);
+    // Create project
+    setIsLoading(true);
+    createProject(validation.value || projectName);
 
-    // Redirect to main application
-    router.push('/');
-  };
-
-  const handleSkip = () => {
-    // Create project with default name
-    createProject('');
-    router.push('/');
-  };
-
-  const handleInputChange = (value: string) => {
-    setProjectName(value);
-    // Clear error on input
-    if (error) {
-      setError('');
-    }
+    // Redirect to dashboard
+    setTimeout(() => {
+      router.push('/');
+    }, 500);
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-[#667eea] to-[#764ba2] flex items-center justify-center px-5">
-      <div className="bg-white/95 backdrop-blur-[10px] rounded-[20px] p-[60px_40px] shadow-[0_20px_60px_rgba(0,0,0,0.3)] max-w-[500px] w-full text-center animate-fadeInUp">
-        <div className="text-5xl mb-5">📋</div>
-
-        <h1 className="text-[#2d3748] text-[32px] mb-3 font-bold">
-          Welcome!
-        </h1>
-
-        <p className="text-[#718096] text-base mb-10 leading-6">
-          Let's get started by giving your project a name. You can always change it later.
-        </p>
-
-        <form onSubmit={handleSubmit}>
-          <div className="mb-8 text-left">
-            <label
-              htmlFor="projectName"
-              className="block text-[#4a5568] font-semibold mb-2 text-sm"
-            >
-              Project Name
-            </label>
-
-            <input
-              type="text"
-              id="projectName"
-              name="projectName"
-              value={projectName}
-              onChange={(e) => handleInputChange(e.target.value)}
-              placeholder="Enter your project name"
-              maxLength={100}
-              autoFocus
-              className="w-full px-4 py-[14px] border-2 border-[#e2e8f0] rounded-xl text-base transition-all duration-300 bg-white focus:outline-none focus:border-[#667eea] focus:shadow-[0_0_0_3px_rgba(102,126,234,0.1)]"
-            />
-
-            {error && (
-              <div className="text-[#e53e3e] text-sm mt-2">
-                {error}
-              </div>
-            )}
-          </div>
-
-          <div className="flex gap-3 mt-8">
-            <button
-              type="submit"
-              className="flex-1 px-6 py-[14px] border-none rounded-xl text-base font-semibold cursor-pointer transition-all duration-300 bg-gradient-to-br from-[#667eea] to-[#764ba2] text-white shadow-[0_4px_15px_rgba(102,126,234,0.4)] hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(102,126,234,0.5)] active:translate-y-0"
-            >
-              Continue
-            </button>
-          </div>
-        </form>
-
-        <button
-          onClick={handleSkip}
-          className="block mt-5 text-[#718096] text-sm no-underline transition-colors duration-300 bg-transparent border-none cursor-pointer hover:text-[#667eea] hover:underline"
-        >
-          Skip for now (will use "Untitled Project")
-        </button>
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 relative overflow-hidden">
+      {/* Decorative background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-gradient-to-br from-blue-200/30 to-purple-200/30 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-gradient-to-br from-pink-200/30 to-orange-200/30 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-br from-indigo-200/20 to-purple-200/20 rounded-full blur-3xl"></div>
       </div>
 
-      <style jsx>{`
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
+      <div className="relative z-10 flex items-center justify-center min-h-screen px-4 py-8">
+        <div className="w-full max-w-xl">
+          {/* Language Toggle - Top Right */}
+          <div className="absolute top-4 right-4">
+            <LanguageToggle />
+          </div>
 
-        .animate-fadeInUp {
-          animation: fadeInUp 0.6s ease;
-        }
+          {/* Brand Header */}
+          <div className="text-center mb-8 animate-fadeIn">
+            <div className="inline-flex items-center justify-center w-16 h-16 mb-4 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-2xl shadow-2xl transform hover:scale-105 transition-transform duration-300">
+              <i className="fa-solid fa-clipboard-list text-white text-2xl"></i>
+            </div>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
+              {t('app.title')}
+            </h1>
+            <p className="text-lg text-gray-600 font-medium">{t('app.subtitle')}</p>
+          </div>
 
-        @media (max-width: 600px) {
-          .setup-container {
-            padding: 40px 24px;
-          }
+          {/* Welcome Card */}
+          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl p-8 mb-8 border border-white/50">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-bold text-gray-800 mb-2">{t('setup.title')}</h2>
+            </div>
 
-          h1 {
-            font-size: 26px;
-          }
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <Input
+                type="text"
+                value={projectName}
+                onChange={(e) => {
+                  setProjectName(e.target.value);
+                  setError('');
+                }}
+                placeholder={t('setup.projectNamePlaceholder')}
+                maxLength={100}
+                required
+                error={error}
+                icon={<i className="fa-solid fa-folder-open text-gray-400"></i>}
+                label={
+                  <span className="flex items-center">
+                    <i className="fa-solid fa-tag text-indigo-500 mr-2"></i>
+                    {t('setup.projectNameLabel')}
+                  </span>
+                }
+              />
 
-          .button-group {
-            flex-direction: column;
-          }
-        }
-      `}</style>
-    </main>
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <i className="fa-solid fa-spinner fa-spin"></i>
+                    <span>{t('setup.creating')}</span>
+                  </>
+                ) : (
+                  <>
+                    <span>{t('setup.createButton')}</span>
+                    <i className="fa-solid fa-arrow-right"></i>
+                  </>
+                )}
+              </Button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

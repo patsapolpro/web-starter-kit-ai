@@ -1,67 +1,58 @@
 /**
- * Safe localStorage wrapper with error handling
+ * Generic localStorage wrapper with error handling
  */
 
 /**
- * Safely get item from localStorage
+ * Get item from localStorage
  */
-export function getItem(key: string): string | null {
+export function getItem<T>(key: string): T | null {
   if (typeof window === 'undefined') return null;
 
   try {
-    return localStorage.getItem(key);
+    const item = window.localStorage.getItem(key);
+    if (item === null) return null;
+    return JSON.parse(item) as T;
   } catch (error) {
-    console.error(`Error reading from localStorage (key: ${key}):`, error);
+    console.error(`Error reading from localStorage (${key}):`, error);
     return null;
   }
 }
 
 /**
- * Safely set item in localStorage
+ * Set item in localStorage
  */
-export function setItem(key: string, value: string): boolean {
-  if (typeof window === 'undefined') return false;
+export function setItem<T>(key: string, value: T): void {
+  if (typeof window === 'undefined') return;
 
   try {
-    localStorage.setItem(key, value);
-    return true;
+    window.localStorage.setItem(key, JSON.stringify(value));
   } catch (error) {
-    console.error(`Error writing to localStorage (key: ${key}):`, error);
-    return false;
+    console.error(`Error writing to localStorage (${key}):`, error);
   }
 }
 
 /**
- * Safely remove item from localStorage
+ * Remove item from localStorage
  */
-export function removeItem(key: string): boolean {
-  if (typeof window === 'undefined') return false;
+export function removeItem(key: string): void {
+  if (typeof window === 'undefined') return;
 
   try {
-    localStorage.removeItem(key);
-    return true;
+    window.localStorage.removeItem(key);
   } catch (error) {
-    console.error(`Error removing from localStorage (key: ${key}):`, error);
-    return false;
+    console.error(`Error removing from localStorage (${key}):`, error);
   }
 }
 
 /**
- * Clear all application data from localStorage
+ * Clear all items from localStorage
  */
-export function clearAllData(): boolean {
-  if (typeof window === 'undefined') return false;
+export function clearAll(): void {
+  if (typeof window === 'undefined') return;
 
   try {
-    const keys = Object.keys(localStorage);
-    keys.forEach((key) => {
-      if (key.startsWith('req-tracker:') && key !== 'req-tracker:schema-version') {
-        localStorage.removeItem(key);
-      }
-    });
-    return true;
+    window.localStorage.clear();
   } catch (error) {
     console.error('Error clearing localStorage:', error);
-    return false;
   }
 }
