@@ -1,17 +1,20 @@
 # UX/UI Requirements Document
 ## Requirement & Effort Tracker MVP
 
-**Document Version:** 1.0
+**Document Version:** 2.0
 **Date:** 2025-12-19
-**Purpose:** This document defines the user experience and interface requirements for the Requirement & Effort Tracker MVP. It provides comprehensive specifications for all screens, user interactions, and data flows to enable the UI/UX design team to create screen prototypes and mockups.
+**Status:** Updated to reflect implemented HTML prototypes
+**Purpose:** This document defines the user experience and interface requirements for the Requirement & Effort Tracker MVP, updated to accurately reflect the HTML prototypes created by the UI/UX team.
 
 ---
 
 ## Table of Contents
 1. [Complete User Flow Diagram](#1-complete-user-flow-diagram)
-2. [Screen-by-Screen Breakdown](#2-screen-by-screen-breakdown)
-3. [Global UI Behaviors](#3-global-ui-behaviors)
-4. [Interaction Patterns Summary](#4-interaction-patterns-summary)
+2. [Visual Design System](#2-visual-design-system)
+3. [Screen-by-Screen Breakdown](#3-screen-by-screen-breakdown)
+4. [Global UI Behaviors](#4-global-ui-behaviors)
+5. [Interaction Patterns Summary](#5-interaction-patterns-summary)
+6. [Implementation Notes](#6-implementation-notes)
 
 ---
 
@@ -103,144 +106,635 @@ graph TD
 
 ---
 
-## 2. Screen-by-Screen Breakdown
+## 2. Visual Design System
+
+This section documents the actual visual design implementation from the HTML prototypes.
+
+### 2.1 Color Palette
+
+**Primary Colors:**
+- Primary Gradient: `linear-gradient(135deg, #667eea 0%, #764ba2 100%)`
+  - Start: `#667eea` (Purple-Blue)
+  - End: `#764ba2` (Purple)
+- Primary Solid: `#667eea` (used for focus states, toggles)
+
+**Neutral Colors:**
+- Dark Text: `#2d3748` (headings, primary text)
+- Medium Text: `#4a5568` (labels, secondary text)
+- Light Text: `#718096` (placeholder text, disabled text)
+- Border Light: `#e2e8f0` (input borders, dividers)
+- Border Medium: `#cbd5e0` (hover states)
+- Background Light: `#f7fafc` (hover backgrounds, inactive states)
+
+**Semantic Colors:**
+- Error/Danger: `#e53e3e` (error messages, delete actions)
+- Error Background: `#fff5f5` (error button backgrounds)
+- Error Border: `#fed7d7` (error button borders)
+- Error Hover: `#fc8181` (error button hover borders)
+
+**Surface Colors:**
+- Card Background: `rgba(255, 255, 255, 0.95)` with `backdrop-filter: blur(10px)` (glassmorphism)
+- Input Background: `white` (solid white)
+- Hover Background: `#f7fafc` (light gray)
+- Edit Row Background: `#f7fafc` (light gray)
+
+### 2.2 Typography
+
+**Font Family:**
+```css
+font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+```
+
+**Font Sizes:**
+- Extra Large: `48px` (total effort value, logo emoji)
+- Large: `32px` (main headings, project name)
+- Medium: `24px` (modal headings)
+- Regular: `20px` (section headings)
+- Base: `16px` (body text, inputs, labels)
+- Small: `14px` (labels, small buttons, error messages)
+- Extra Small: `13px` (icon button text)
+
+**Font Weights:**
+- Bold: `700` (main headings)
+- Semi-Bold: `600` (labels, buttons, subheadings)
+- Medium: `500` (total effort label)
+- Regular: `400` (body text)
+
+**Line Heights:**
+- Standard: `1.5` (body text, descriptions)
+- Tight: `1.4` (warning text)
+
+### 2.3 Spacing System
+
+**Padding:**
+- Cards (Desktop): `30px 40px` or `60px 40px` (setup screen)
+- Cards (Mobile): `20px` or `40px 24px` (setup screen)
+- Inputs: `12px 16px` or `14px 16px`
+- Buttons: `12px 24px` (regular), `14px 24px` (large), `8px 16px` (small), `6px 12px` (icon)
+- Table Cells: `12px` (headers), `16px 12px` (body)
+- Modal: `40px` (desktop), `30px 20px` (mobile)
+
+**Margins:**
+- Between Cards: `20px`
+- Between Sections: `20px` - `30px`
+- Form Group Bottom: `16px` - `30px`
+- Element Gaps: `8px`, `12px`, `20px`
+
+**Container Widths:**
+- Setup Card Max Width: `500px`
+- Main Container Max Width: `1200px`
+- Modal Max Width: `500px`
+
+### 2.4 Border Radius
+
+- Large Cards: `20px`
+- Inputs/Buttons: `12px`
+- Small Buttons: `10px`
+- Icon Buttons: `8px`
+- Toggle Switch: `13px` (pill shape)
+- Badge: `12px`
+
+### 2.5 Shadows
+
+**Card Shadows:**
+- Standard: `0 10px 40px rgba(0, 0, 0, 0.2)`
+- Deep: `0 20px 60px rgba(0, 0, 0, 0.3)` (setup screen, modals)
+
+**Button Shadows:**
+- Primary: `0 4px 15px rgba(102, 126, 234, 0.4)`
+- Primary Hover: `0 6px 20px rgba(102, 126, 234, 0.5)`
+- Danger: `0 4px 15px rgba(229, 62, 62, 0.4)`
+
+**Focus Shadows:**
+- Input Focus: `0 0 0 3px rgba(102, 126, 234, 0.1)`
+
+**Element Shadows:**
+- Toggle Slider: `0 2px 4px rgba(0, 0, 0, 0.2)`
+
+### 2.6 Transitions
+
+**Standard Transitions:**
+```css
+transition: all 0.3s ease;
+```
+
+**Applied To:**
+- Buttons (hover, active states)
+- Inputs (focus states)
+- Table rows (hover)
+- Links (hover)
+- Toggle switches
+- Modal overlays
+- Icon buttons
+
+### 2.7 Animations
+
+**Fade In Up (Setup Screen):**
+```css
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+animation: fadeInUp 0.6s ease;
+```
+
+**Modal Slide In:**
+```css
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+animation: modalSlideIn 0.3s ease;
+```
+
+**Hover Transforms:**
+- Button Lift: `translateY(-2px)` (on hover)
+- Button Reset: `translateY(0)` (on active)
+
+### 2.8 Responsive Breakpoints
+
+**Mobile (max-width: 768px):**
+- Card padding reduced to `20px`
+- Project name font size: `24px` → `26px` (setup)
+- Button groups: flex-direction changes to column
+- Modal padding reduced to `30px 20px`
+- Grid layouts change to single column
+
+**Small Mobile (max-width: 600px):**
+- Setup card padding: `40px 24px`
+- Main heading: `26px`
+- Button groups: stacked vertically
+
+---
+
+## 3. Screen-by-Screen Breakdown
 
 ### Screen 1: First-Time Setup Screen
+
+**File:** `01-first-time-setup.html`
 
 **Screen Name:** First-Time Project Setup
 
 **Screen Purpose:**
 Displayed only when no saved data exists in local storage. Captures initial project name and transitions user to the main application interface.
 
+**Visual Layout:**
+- Centered card design (max-width: 500px)
+- Glassmorphism effect: semi-transparent white card with backdrop blur
+- Purple gradient background covering full viewport
+- Vertically and horizontally centered on screen
+- Fade-up animation on load (0.6s)
+
+**Visual Elements:**
+
+**Logo/Icon:**
+- Emoji: 📋 (clipboard)
+- Size: 48px
+- Position: Top center of card
+- Margin below: 20px
+
+**Heading:**
+- Text: "Welcome!"
+- Font size: 32px (desktop), 26px (mobile)
+- Font weight: 700 (bold)
+- Color: `#2d3748` (dark gray)
+- Margin bottom: 12px
+
+**Subtitle:**
+- Text: "Let's get started by giving your project a name. You can always change it later."
+- Font size: 16px
+- Color: `#718096` (medium gray)
+- Line height: 1.5
+- Margin bottom: 40px
+
 **User Interactions:**
 - Enter text into project name input field
-- Click/tap "Continue" or "Start" button to proceed
-- Click/tap "Skip" link/button to use default name
+- Click/tap "Continue" button to proceed
+- Click/tap "Skip for now" link to use default name
 - Press Enter key in input field to proceed (keyboard shortcut)
 
 **Input Fields:**
 
 | Field Name | Type | Required | Validation Rules | Default Value | Placeholder Text |
 |------------|------|----------|------------------|---------------|------------------|
-| Project Name | Text | No (can skip) | - Max 100 characters<br>- Cannot be only whitespace<br>- If empty or whitespace only, defaults to "Untitled Project"<br>- Special characters allowed | "Untitled Project" (if skipped) | "Enter your project name" |
+| Project Name | Text (single-line) | No (can skip) | - Max 100 characters<br>- Cannot be only whitespace<br>- If empty or whitespace only, defaults to "Untitled Project"<br>- Special characters allowed | "Untitled Project" (if skipped) | "Enter your project name" |
 
-**Output/Displayed Data:**
-- Welcome message or heading (e.g., "Welcome to Requirement & Effort Tracker")
-- Instructions (e.g., "Give your project a name to get started")
-- Project name input field
-- "Continue"/"Start" button
-- "Skip" link or button (optional, smaller/less prominent)
+**Input Field Styling:**
+- Width: 100%
+- Padding: 14px 16px
+- Border: 2px solid `#e2e8f0`
+- Border radius: 12px
+- Font size: 16px
+- Background: white
+- Focus state: Border `#667eea`, shadow `0 0 0 3px rgba(102, 126, 234, 0.1)`
+
+**Buttons:**
+
+**Primary Button ("Continue"):**
+- Style: Full-width button in flex container
+- Padding: 14px 24px
+- Border radius: 12px
+- Font size: 16px
+- Font weight: 600
+- Background: Linear gradient `#667eea` to `#764ba2`
+- Color: white
+- Shadow: `0 4px 15px rgba(102, 126, 234, 0.4)`
+- Hover: Lift up 2px, shadow `0 6px 20px rgba(102, 126, 234, 0.5)`
+- Active: Reset to position 0
+
+**Skip Link:**
+- Text: "Skip for now (will use "Untitled Project")"
+- Font size: 14px
+- Color: `#718096` (medium gray)
+- Position: Below button (20px margin top)
+- Center aligned
+- Hover: Color changes to `#667eea`, underline appears
+- No border or background
 
 **Navigation:**
 - **From:** Application entry point (URL)
-- **To:** Main Application Screen (after name entry or skip)
-- **Trigger:** User clicks Continue/Start button OR presses Enter in input field OR clicks Skip
+- **To:** Main Application Screen (02-main-application.html)
+- **Trigger:** User clicks Continue button OR presses Enter in input field OR clicks Skip link
+- **Transition:** Page navigation (href or window.location)
 
 **Error States:**
 - **Project name exceeds 100 characters:**
   - Error message: "Project name must not exceed 100 characters"
-  - Display: Below or adjacent to input field
+  - Display: Below input field
+  - Font size: 14px
+  - Color: `#e53e3e` (red)
+  - Margin top: 8px
+  - Initially hidden (display: none), shows when validation fails
   - Behavior: Prevent proceeding until corrected
+
+**Error Message Behavior:**
+- Hidden by default
+- Appears on submit if validation fails
+- Clears on input (as user types)
 
 **Success States:**
 - **Valid project name entered:**
-  - Success indicator: None needed (immediate transition)
-  - Action: Transition to Main Application Screen
+  - Success indicator: None (immediate transition)
+  - Action: Save to localStorage, redirect to main application
 - **User skips naming:**
-  - Success indicator: None needed (immediate transition)
-  - Action: Set project name to "Untitled Project" and transition to Main Application Screen
+  - Success indicator: None (immediate transition)
+  - Action: Save "Untitled Project" to localStorage, redirect to main application
+
+**Data Persistence:**
+- Project name saved to `localStorage` with key `'projectName'`
+- Saves immediately before navigation
+
+**Responsive Behavior:**
+- Mobile (≤600px): Card padding reduces to 40px 24px, heading size 26px, buttons stack vertically
 
 ---
 
 ### Screen 2: Main Application Screen
+
+**File:** `02-main-application.html`
 
 **Screen Name:** Main Application Screen (Dashboard)
 
 **Screen Purpose:**
 Primary interface where users manage their project. Displays project name, requirement list, add requirement form, total effort calculation, and all management controls.
 
+**Visual Layout:**
+- Full viewport with purple gradient background
+- Container: max-width 1200px, centered
+- Padding: 20px around container
+- Multiple card sections stacked vertically with 20px gaps:
+  1. Header card (project name + controls)
+  2. Total effort card (gradient)
+  3. Add requirement form card
+  4. Requirements list card
+
+**Section 1: Header Card**
+
+**Visual Styling:**
+- Background: `rgba(255, 255, 255, 0.95)` with backdrop blur
+- Border radius: 20px
+- Padding: 30px 40px (desktop), 20px (mobile)
+- Shadow: `0 10px 40px rgba(0, 0, 0, 0.2)`
+- Layout: Flexbox, space-between, wrap enabled
+- Gap: 20px
+
+**Project Name Display (Normal State):**
+- Font size: 32px (desktop), 24px (mobile)
+- Font weight: 700
+- Color: `#2d3748`
+- Cursor: pointer
+- Padding: 8px 12px
+- Border radius: 8px
+- Display: Flex with gap 10px
+- Edit icon: ✏️ (20px, 50% opacity)
+- Hover: Background `rgba(102, 126, 234, 0.1)`, color `#667eea`
+- Transition: all 0.3s ease
+
+**Project Name Edit Mode:**
+- Display: Flex with gap 12px
+- Input flex: 1
+- Input padding: 12px 16px
+- Input border: 2px solid `#667eea`
+- Input border radius: 12px
+- Input font size: 18px
+- Input font weight: 600
+- Buttons: "Save" (primary) and "Cancel" (secondary)
+- Button size: Small (8px 16px padding, 14px font)
+
+**Clear All Data Button:**
+- Background: white
+- Color: `#e53e3e` (red)
+- Border: 2px solid `#fed7d7` (light red)
+- Padding: 10px 20px
+- Border radius: 10px
+- Font size: 14px
+- Font weight: 600
+- Icon: 🗑️ emoji prefix
+- Hover: Background `#fff5f5`, border `#fc8181`
+
+**Section 2: Total Effort Card**
+
+**Visual Styling:**
+- Background: Linear gradient `#667eea` to `#764ba2`
+- Border radius: 20px
+- Padding: 30px 40px (desktop), 20px (mobile)
+- Shadow: `0 10px 40px rgba(0, 0, 0, 0.2)`
+- Color: white
+- Text align: center
+- Can be hidden via `.hidden` class (display: none)
+
+**Content:**
+- Label: "Total Active Effort"
+  - Font size: 16px
+  - Opacity: 0.9
+  - Font weight: 500
+  - Margin bottom: 8px
+- Value: Dynamic number (e.g., "27.50")
+  - Font size: 48px
+  - Font weight: 700
+  - Format: 2 decimal places
+
+**Section 3: Add Requirement Form Card**
+
+**Visual Styling:**
+- Background: `rgba(255, 255, 255, 0.95)` with backdrop blur
+- Border radius: 20px
+- Padding: 30px 40px (desktop), 20px (mobile)
+- Shadow: `0 10px 40px rgba(0, 0, 0, 0.2)`
+
+**Heading:**
+- Text: "Add New Requirement"
+- Font size: 20px
+- Font weight: 600
+- Color: `#2d3748`
+- Margin bottom: 20px
+
 **User Interactions:**
-
-**Project Name Area:**
-- Click/tap project name to edit it
-- Hover over project name to indicate it's editable (cursor change)
-
-**Add Requirement Form:**
-- Enter text into requirement description field
-- Enter numeric value into effort field
+- Enter text into requirement description field (textarea)
+- Enter numeric value into effort field (number input)
 - Click/tap "Add Requirement" button
-- Press Enter in either field to submit (keyboard shortcut)
+- Press Enter in either field to submit
 - Tab between fields for keyboard navigation
-
-**Requirements List:**
-- Click/tap status toggle (checkbox/switch) to change Active/Inactive status
-- Click/tap "Edit" button to enter edit mode for a requirement
-- Click/tap "Delete" button to trigger delete confirmation
-- Scroll through list if many requirements exist
-
-**Display Controls:**
-- Click/tap "Hide Effort" / "Show Effort" button to toggle column visibility
-- Click/tap "Clear All Data" / "New Project" link/button to trigger clear confirmation
 
 **Input Fields:**
 
-**Add Requirement Form:**
-
 | Field Name | Type | Required | Validation Rules | Default Value | Placeholder Text |
 |------------|------|----------|------------------|---------------|------------------|
-| Requirement Description | Text (multiline or single line) | Yes | - Cannot be empty or only whitespace<br>- Max 500 characters<br>- Special characters allowed | Empty | "Enter requirement description" |
-| Effort | Number | Yes | - Must be numeric<br>- Must be greater than 0<br>- Max value: 1000<br>- Decimals allowed (e.g., 0.5, 1.5, 13.75) | Empty | "0.0" or "Enter effort" |
+| Requirement Description | Textarea (multiline) | Yes | - Cannot be empty or only whitespace<br>- Max 500 characters<br>- Special characters allowed | Empty | "Enter requirement description" |
+| Effort | Number | Yes | - Must be numeric<br>- Must be greater than 0<br>- Max value: 1000<br>- Decimals allowed (step="0.1") | Empty | "0.0" |
+
+**Form Layout:**
+- Grid layout for desktop: 2 rows
+- Row 1: Description field (full width, grid-column: 1 / -1)
+- Row 2: Effort field + Add button (2 columns with auto sizing)
+- Gap: 12px
+- Mobile: Stacks to single column
+
+**Input Field Styling:**
+
+**Textarea (Description):**
+- Width: 100%
+- Padding: 12px 16px
+- Border: 2px solid `#e2e8f0`
+- Border radius: 12px
+- Font size: 16px
+- Font family: Inherited
+- Background: white
+- Resize: vertical
+- Min height: 60px
+- Focus: Border `#667eea`, shadow `0 0 0 3px rgba(102, 126, 234, 0.1)`
+- Error state: Border `#e53e3e` (red)
+
+**Number Input (Effort):**
+- Same styling as textarea
+- Type: number
+- Step: 0.1
+- Min: 0.1
+- Max: 1000
+- Width: auto (fits grid)
+
+**Label Styling:**
+- Display: block
+- Color: `#4a5568` (dark gray)
+- Font weight: 600
+- Font size: 14px
+- Margin bottom: 8px
+
+**Error Message Styling:**
+- Color: `#e53e3e` (red)
+- Font size: 13px
+- Display: none (default)
+- Shows when validation fails (display: block)
+- Positioned below respective field
+
+**Add Button:**
+- Background: Linear gradient `#667eea` to `#764ba2`
+- Color: white
+- Padding: 12px 24px
+- Border radius: 12px
+- Font size: 16px
+- Font weight: 600
+- Shadow: `0 4px 15px rgba(102, 126, 234, 0.4)`
+- Hover: Lift 2px, shadow `0 6px 20px rgba(102, 126, 234, 0.5)`
+- Position: Aligned to flex-end (bottom of effort field row)
+- Margin bottom: 24px (to align with input field)
 
 **Dependencies:**
-- Both fields must be valid for "Add Requirement" button to submit successfully
-- After successful addition, both fields clear and focus returns to description field
+- Both fields must be valid for submission
+- After successful addition, both fields clear
+- Focus returns to description field automatically
 
-**Output/Displayed Data:**
+**Section 4: Requirements List Card**
 
-**Project Name Section:**
-- Project name displayed as prominent heading at top of screen
-- Visual indicator that name is clickable/editable (subtle styling)
+**Visual Styling:**
+- Background: `rgba(255, 255, 255, 0.95)` with backdrop blur
+- Border radius: 20px
+- Padding: 30px 40px (desktop), 20px (mobile)
+- Shadow: `0 10px 40px rgba(0, 0, 0, 0.2)`
 
-**Total Effort Display:**
-- Label: "Total Active Effort" or "Total Effort"
-- Value: Numeric sum of all active requirements, formatted to 2 decimal places
-- Dynamic: Updates in real-time when requirements are added, edited, deleted, or status changes
-- Shows "0" or "0.00" when no active requirements exist
+**Requirements Header:**
+- Layout: Flexbox, space-between, wrap enabled
+- Gap: 12px
+- Margin bottom: 20px
 
-**Requirements List (Table/List Format):**
-Each row displays:
-- **Status Toggle Column:** Checkbox or switch control (checked = Active, unchecked = Inactive)
-- **Requirement Description Column:** Full text of requirement
-- **Effort Column:** Numeric effort value (can be hidden via toggle control)
-- **Actions Column:** "Edit" and "Delete" buttons/icons
+**Heading:**
+- Text: "Requirements"
+- Font size: 20px
+- Font weight: 600
+- Color: `#2d3748`
 
-Visual distinction for inactive requirements:
-- Reduced opacity OR grayed out appearance
-- Maintains readability of text
+**Effort Visibility Toggle:**
+- Layout: Flex, gap 8px
+- Cursor: pointer
+- User-select: none
+
+**Toggle Switch Component:**
+- Width: 50px
+- Height: 26px
+- Background: `#cbd5e0` (inactive), `#667eea` (active)
+- Border radius: 13px (pill)
+- Position: relative
+- Transition: all 0.3s ease
+
+**Toggle Slider:**
+- Width: 22px
+- Height: 22px
+- Background: white
+- Border radius: 50% (circle)
+- Position: absolute, top 2px, left 2px (inactive) or 26px (active)
+- Shadow: `0 2px 4px rgba(0, 0, 0, 0.2)`
+- Transition: all 0.3s ease
+
+**Toggle Label:**
+- Text: "Hide Effort" (when visible) or "Show Effort" (when hidden)
+- Font size: 14px
+- Color: `#4a5568`
+
+**Requirements Table:**
+
+**Table Structure:**
+- Width: 100%
+- Border collapse: collapse
+
+**Table Head:**
+- Border bottom: 2px solid `#e2e8f0`
+- Columns:
+  1. "Active" (width: 50px)
+  2. "Description" (flexible width)
+  3. "Effort" (width: 120px, can be hidden)
+  4. "Actions" (width: 140px)
+
+**Table Header Cells:**
+- Text align: left
+- Padding: 12px
+- Color: `#4a5568`
+- Font weight: 600
+- Font size: 14px
+
+**Table Body Rows:**
+- Border bottom: 1px solid `#e2e8f0`
+- Transition: all 0.3s ease
+- Hover: Background `#f7fafc` (light gray)
+- Inactive class: Opacity 0.5
+
+**Table Body Cells:**
+- Padding: 16px 12px
+- Color: `#2d3748`
+
+**Status Toggle (Checkbox):**
+- Width: 20px
+- Height: 20px
+- Cursor: pointer
+- Accent color: `#667eea` (custom browser checkbox color)
+- Type: checkbox
+- Checked: Active requirement
+- Unchecked: Inactive requirement
+
+**Requirement Description:**
+- Word break: break-word (handles long text)
+- Full text display
+
+**Effort Value:**
+- Format: 2 decimal places (e.g., "12.50")
+- Column can be hidden via toggle
+
+**Action Buttons:**
+- Layout: Flex, gap 8px
+
+**Edit Button:**
+- Padding: 6px 12px
+- Border: none
+- Border radius: 8px
+- Font size: 13px
+- Font weight: 600
+- Background: `#edf2f7` (light gray)
+- Color: `#667eea` (purple)
+- Cursor: pointer
+- Hover: Background `#e6f2ff` (light blue)
+
+**Delete Button:**
+- Padding: 6px 12px
+- Border: none
+- Border radius: 8px
+- Font size: 13px
+- Font weight: 600
+- Background: `#fff5f5` (light red)
+- Color: `#e53e3e` (red)
+- Cursor: pointer
+- Hover: Background `#fed7d7` (medium red)
 
 **Empty State:**
-When no requirements exist:
-- Message: "No requirements yet. Add your first requirement above."
-- Display: In place of requirements list
 
-**List Ordering:**
-- Requirements displayed in chronological order (oldest first, newest last)
-- Order preserved after edits and status changes
+**When No Requirements Exist:**
+- Text align: center
+- Padding: 60px 20px
+- Color: `#718096` (medium gray)
 
-**Effort Column Visibility Control:**
-- Button/toggle labeled "Hide Effort" when visible
-- Button/toggle labeled "Show Effort" when hidden
-- When hidden: Effort column (header and all values) removed from display
-- When hidden: Description column expands to use available space
-- Optional: Total effort summary may also hide based on preference
+**Icon:**
+- Emoji: 📝 (memo)
+- Font size: 64px
+- Margin bottom: 16px
+- Opacity: 0.5
+
+**Message:**
+- Text: "No requirements yet. Add your first requirement above."
+- Font size: 18px
+- Line height: 1.5
+
+**User Interactions:**
+
+**Requirements List:**
+- Click/tap checkbox to toggle Active/Inactive status
+- Click/tap "Edit" button to enter inline edit mode
+- Click/tap "Delete" button to show delete confirmation modal
+- Hover over rows for visual feedback
+- Scroll if many requirements exist
+
+**Display Controls:**
+- Click/tap toggle switch to hide/show effort column
+- Toggle switch changes state immediately
+- Label text updates to reflect state
+- Column visibility changes immediately
 
 **Navigation:**
 - **From:** First-Time Setup Screen OR returning user entry point
 - **To:**
-  - Project Name Edit Mode (when project name clicked)
-  - Requirement Edit Mode (when Edit button clicked)
-  - Delete Confirmation Dialog (when Delete button clicked)
-  - Clear All Data Confirmation Dialog (when Clear All Data clicked)
+  - Project Name Edit Mode (inline, same screen)
+  - Requirement Edit Mode (inline, same screen)
+  - Delete Confirmation Dialog (modal overlay)
+  - Clear All Data Confirmation Dialog (modal overlay)
 - **Refresh/Reload:** Stays on Main Application Screen with persisted data
 - **Close/Reopen Browser:** Returns to Main Application Screen with persisted data
 
@@ -249,595 +743,996 @@ When no requirements exist:
 **Add Requirement - Description Validation:**
 - **Empty description:**
   - Error message: "Requirement description is required"
-  - Display: Below or adjacent to description field
+  - Display: Below description field
+  - Color: `#e53e3e`, size: 13px
   - Timing: On submit attempt
+  - Field border changes to red
 - **Description exceeds 500 characters:**
   - Error message: "Description must not exceed 500 characters"
-  - Display: Below or adjacent to description field
-  - Timing: On submit attempt or real-time (design team choice)
+  - Same styling and behavior as above
 
 **Add Requirement - Effort Validation:**
 - **Empty effort:**
   - Error message: "Effort value is required"
-  - Display: Below or adjacent to effort field
-  - Timing: On submit attempt
+  - Display: Below effort field
 - **Non-numeric effort:**
   - Error message: "Effort must be a number"
-  - Display: Below or adjacent to effort field
-  - Timing: On submit attempt
 - **Zero or negative effort:**
   - Error message: "Effort must be greater than 0"
-  - Display: Below or adjacent to effort field
-  - Timing: On submit attempt
 - **Effort exceeds 1000:**
   - Error message: "Effort must not exceed 1000"
-  - Display: Below or adjacent to effort field
-  - Timing: On submit attempt
 
 **Multiple Validation Errors:**
 - Both description and effort errors can display simultaneously
-- Each error message appears near its respective field
+- Each appears below respective field
 
 **Error Message Behavior:**
-- Errors appear only when validation fails
-- Errors disappear when user begins correcting input (on input change)
+- Hidden by default (display: none)
+- Shows on submit if validation fails (display: block)
+- Clears on input (when user starts typing)
+- Associated field gets red border (class: error)
 
 **Success States:**
 
 **Add Requirement Success:**
-- Success indicator: None needed (immediate visual feedback)
-- Actions:
+- No explicit success indicator
+- Immediate visual feedback:
   - New requirement appears at bottom of list
   - Both input fields clear
   - Focus returns to description field
-  - Total effort updates if applicable
-  - Data saved to local storage
+  - Total effort updates if requirement is active
+  - Data saved to localStorage automatically
 
 **Toggle Status Success:**
-- Success indicator: Visual change in row appearance (grayed/normal)
-- Actions:
-  - Status toggle state changes (checked/unchecked)
-  - Row visual styling updates
-  - Total effort recalculates and updates
-  - Data saved to local storage
+- Checkbox state changes immediately (checked/unchecked)
+- Row opacity changes (50% if inactive, 100% if active)
+- Total effort recalculates and updates immediately
+- Data saved to localStorage automatically
 
 **Toggle Effort Visibility Success:**
-- Success indicator: Column appearance/disappearance
-- Actions:
-  - Effort column and header hide or show
-  - Button label changes ("Hide Effort" ↔ "Show Effort")
-  - Description column resizes
-  - Preference saved to local storage
+- Column appears/disappears immediately
+- Toggle switch animates to new position
+- Toggle slider moves left/right
+- Toggle label text updates
+- Switch background color changes
+- Preference saved to localStorage
 
 ---
 
 ### Screen 3: Project Name Edit Mode
 
-**Screen Name:** Project Name Edit Mode
+**Implementation:** Inline edit mode within main application screen
 
-**Screen Purpose:**
-Allows user to modify the project name inline without navigating away from main screen.
+**Visual State:**
+- Project name display is hidden
+- Edit form is shown (flex display)
+- Input field is pre-filled with current project name
+- Input has focus and text is selected (for easy overwriting)
+- Two buttons: "Save" (primary) and "Cancel" (secondary)
+
+**Component Details:**
+
+**Input Field:**
+- Flex: 1 (takes available space)
+- Padding: 12px 16px
+- Border: 2px solid `#667eea` (always active color)
+- Border radius: 12px
+- Font size: 18px
+- Font weight: 600
+- Box shadow: `0 0 0 3px rgba(102, 126, 234, 0.1)` (focus ring)
+- Pre-filled with current value
+- Auto-focused
+- Text selected
+
+**Save Button:**
+- Style: Primary button (gradient)
+- Size: Small (8px 16px padding, 14px font)
+- Text: "Save"
+
+**Cancel Button:**
+- Style: Secondary button (white with border)
+- Size: Small (8px 16px padding, 14px font)
+- Text: "Cancel"
 
 **User Interactions:**
 - Type new project name in text field
-- Click/tap "Save" button to confirm changes
-- Click/tap "Cancel" button to discard changes
+- Click "Save" to confirm changes
+- Click "Cancel" to discard changes
 - Press Enter to save (keyboard shortcut)
 - Press Escape to cancel (keyboard shortcut)
-- Click outside edit area to cancel (optional behavior)
+- Click outside edit area to cancel (optional)
 
-**Input Fields:**
+**Validation:**
+- Max 100 characters
+- Cannot be only whitespace
+- If empty/whitespace: Error message "Project name cannot be empty"
+- If > 100 chars: Error message "Project name must not exceed 100 characters"
 
-| Field Name | Type | Required | Validation Rules | Default Value | Placeholder Text |
-|------------|------|----------|------------------|---------------|------------------|
-| Project Name | Text | Yes (cannot be empty) | - Max 100 characters<br>- Cannot be only whitespace<br>- Special characters allowed | Current project name (pre-filled) | N/A |
+**Error Display:**
+- Below or adjacent to input field
+- Font size: 14px
+- Color: `#e53e3e`
+- Prevents saving until corrected
 
-**Output/Displayed Data:**
-- Text input field pre-filled with current project name
-- "Save" button
-- "Cancel" button
-- Focus automatically set to input field with text selected (for easy overwriting)
-
-**Navigation:**
-- **From:** Main Application Screen (click on project name)
-- **To:** Main Application Screen (after save or cancel)
-- **Trigger:** Clicking project name activates edit mode
-- **Exit:** Save button, Cancel button, Enter key, Escape key, or click outside
-
-**Error States:**
-- **Empty project name or only whitespace:**
-  - Error message: "Project name cannot be empty"
-  - Display: Below or adjacent to input field
-  - Behavior: Prevent saving until corrected
-- **Project name exceeds 100 characters:**
-  - Error message: "Project name must not exceed 100 characters"
-  - Display: Below or adjacent to input field
-  - Behavior: Prevent saving until corrected
-
-**Success States:**
-- **Valid project name saved:**
-  - Success indicator: None needed (immediate transition)
-  - Actions:
-    - Project name updates in display
-    - Edit mode closes, returns to normal display
-    - Data saved to local storage
-- **Edit canceled:**
-  - Success indicator: None needed (immediate transition)
-  - Actions:
-    - Original project name preserved
-    - Edit mode closes, returns to normal display
-    - No data changes
+**Exit Behavior:**
+- **Save Success:** Edit mode closes, project name updates, data saved to localStorage
+- **Cancel:** Edit mode closes, original name restored, no data changes
 
 ---
 
 ### Screen 4: Requirement Edit Mode
 
-**Screen Name:** Requirement Edit Mode (Inline Row Editing)
+**Implementation:** Inline edit mode within requirements table row
 
-**Screen Purpose:**
-Allows user to modify an existing requirement's description and effort value inline within the requirements list.
+**Visual State:**
+- Row background changes to `#f7fafc` (light gray) with class "edit-row"
+- Status checkbox remains visible but disabled
+- Description and effort cells merge (colspan="3")
+- Edit form appears inline
+
+**Edit Form Layout:**
+- Display: Flex
+- Gap: 12px
+- Align items: flex-start
+
+**Components:**
+
+**Textarea (Description):**
+- Flex: 1 (takes most space)
+- Padding: 8px 12px
+- Border: 2px solid `#667eea` (active color)
+- Border radius: 8px
+- Font size: 14px
+- Font family: Inherited
+- Resize: vertical
+- Min height: 60px
+- Box shadow: `0 0 0 3px rgba(102, 126, 234, 0.1)`
+- Pre-filled with current value
+- Auto-focused
+
+**Number Input (Effort):**
+- Width: 100px (fixed)
+- Padding: 8px 12px
+- Border: 2px solid `#667eea`
+- Border radius: 8px
+- Font size: 14px
+- Box shadow: `0 0 0 3px rgba(102, 126, 234, 0.1)`
+- Pre-filled with current value
+- Type: number, step: 0.1
+
+**Action Buttons:**
+- Display: Flex
+- Gap: 8px
+- Flex direction: column (desktop), row (mobile)
+
+**Save Button:**
+- Style: Primary (gradient)
+- Size: Small (8px 16px padding, 13px font)
+- Text: "Save"
+
+**Cancel Button:**
+- Style: Secondary (white with border)
+- Size: Small (8px 16px padding, 13px font)
+- Text: "Cancel"
+
+**Behavior:**
+- Only one requirement can be in edit mode at a time
+- Clicking "Edit" on another requirement cancels current edit
+- Delete and other row buttons hidden or disabled during edit
 
 **User Interactions:**
-- Type new description in text field
+- Type new description in textarea
 - Type new effort value in number field
-- Click/tap "Save" button to confirm changes
-- Click/tap "Cancel" button to discard changes
-- Press Enter to save (keyboard shortcut)
-- Press Escape to cancel (keyboard shortcut)
-- Tab between fields for keyboard navigation
+- Click "Save" to confirm changes
+- Click "Cancel" to discard changes
+- Press Enter to save
+- Press Escape to cancel
+- Tab between fields
 
-**Implementation Note:**
-- Only one requirement can be in edit mode at a time
-- Clicking "Edit" on another requirement automatically cancels any in-progress edit
+**Validation:**
+- Same rules as add requirement form
+- Errors shown inline within edit row
+- Prevents saving until corrected
 
-**Input Fields:**
-
-| Field Name | Type | Required | Validation Rules | Default Value | Placeholder Text |
-|------------|------|----------|------------------|---------------|------------------|
-| Requirement Description | Text (multiline or single line) | Yes | - Cannot be empty or only whitespace<br>- Max 500 characters<br>- Special characters allowed | Current description (pre-filled) | N/A |
-| Effort | Number | Yes | - Must be numeric<br>- Must be greater than 0<br>- Max value: 1000<br>- Decimals allowed | Current effort (pre-filled) | N/A |
-
-**Output/Displayed Data:**
-- Text input field with current requirement description
-- Number input field with current effort value
-- "Save" button
-- "Cancel" button
-- Status toggle remains visible but may be disabled during edit
-- Delete button may be hidden or disabled during edit
-
-**Navigation:**
-- **From:** Main Application Screen (click "Edit" button on a requirement row)
-- **To:** Main Application Screen (after save or cancel)
-- **Trigger:** Clicking "Edit" button transforms row into edit mode
-- **Exit:** Save button, Cancel button, Enter key, Escape key
-
-**Error States:**
-
-**Description Validation:**
-- **Empty description:**
-  - Error message: "Requirement description is required"
-  - Display: Below or within the edit row
-  - Timing: On save attempt
-- **Description exceeds 500 characters:**
-  - Error message: "Description must not exceed 500 characters"
-  - Display: Below or within the edit row
-  - Timing: On save attempt
-
-**Effort Validation:**
-- **Empty effort:**
-  - Error message: "Effort value is required"
-  - Display: Below or within the edit row
-  - Timing: On save attempt
-- **Non-numeric effort:**
-  - Error message: "Effort must be a number"
-  - Display: Below or within the edit row
-  - Timing: On save attempt
-- **Zero or negative effort:**
-  - Error message: "Effort must be greater than 0"
-  - Display: Below or within the edit row
-  - Timing: On save attempt
-- **Effort exceeds 1000:**
-  - Error message: "Effort must not exceed 1000"
-  - Display: Below or within the edit row
-  - Timing: On save attempt
-
-**Multiple Errors:**
-- Both description and effort errors can display simultaneously within edit row
-
-**Success States:**
-- **Valid changes saved:**
-  - Success indicator: None needed (immediate visual feedback)
-  - Actions:
-    - Row returns to display mode with updated values
-    - Total effort recalculates if requirement is active
-    - Requirement's "Last Modified Date" updates
-    - Data saved to local storage
-    - Requirement's status (Active/Inactive) preserved
-- **Edit canceled:**
-  - Success indicator: None needed (immediate visual feedback)
-  - Actions:
-    - Row returns to display mode with original values
-    - No data changes
+**Exit Behavior:**
+- **Save Success:** Row returns to display mode with updated values, total recalculates, data saved
+- **Cancel:** Row returns to display mode with original values, no changes
 
 ---
 
-### Screen 5: Delete Requirement Confirmation Dialog
+### Screen 5: Delete Confirmation Dialog
 
-**Screen Name:** Delete Requirement Confirmation
+**Implementation:** Modal overlay
 
-**Screen Purpose:**
-Confirms user intent before permanently deleting a requirement. Prevents accidental data loss.
+**Modal Overlay:**
+- Position: fixed, top/left/right/bottom: 0
+- Background: `rgba(0, 0, 0, 0.5)` (50% black)
+- Display: Flex (when shown), aligned center, justified center
+- Z-index: 1000
+- Padding: 20px
+- Click outside to close (optional)
+
+**Modal Box:**
+- Background: white (solid)
+- Border radius: 20px
+- Padding: 40px (desktop), 30px 20px (mobile)
+- Max width: 500px
+- Width: 100%
+- Shadow: `0 20px 60px rgba(0, 0, 0, 0.3)`
+- Animation: modalSlideIn 0.3s ease
+
+**Animation:**
+```css
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+```
+
+**Content:**
+
+**Icon:**
+- Emoji: ⚠️ (warning)
+- Font size: 48px
+- Text align: center
+- Margin bottom: 20px
+
+**Heading:**
+- Text: "Delete Requirement"
+- Font size: 24px
+- Font weight: 700
+- Color: `#2d3748`
+- Margin bottom: 12px
+- Text align: center
+
+**Message:**
+- Text: "Are you sure you want to delete this requirement? This action cannot be undone."
+- Font size: 16px
+- Color: `#718096` (medium gray)
+- Line height: 1.5
+- Margin bottom: 30px
+- Text align: center
+
+**Action Buttons:**
+- Layout: Flex, gap 12px
+- Each button: Flex 1 (equal width)
+- Mobile: Flex direction column-reverse
+
+**Cancel Button:**
+- Style: Secondary (white with border)
+- Border: 2px solid `#e2e8f0`
+- Padding: 14px 24px
+- Border radius: 12px
+- Font size: 16px
+- Font weight: 600
+- Color: `#718096`
+- Hover: Background `#f7fafc`
+
+**Delete Button:**
+- Background: `#e53e3e` (solid red, not outlined)
+- Color: white
+- Padding: 14px 24px
+- Border radius: 12px
+- Font size: 16px
+- Font weight: 600
+- Shadow: `0 4px 15px rgba(229, 62, 62, 0.4)`
+- Text: "Delete"
 
 **User Interactions:**
-- Click/tap "Delete" button to confirm deletion
-- Click/tap "Cancel" button to dismiss dialog
-- Press Enter to confirm (keyboard shortcut)
-- Press Escape to cancel (keyboard shortcut)
-- Click outside dialog to cancel (optional behavior)
+- Click "Delete" to confirm deletion
+- Click "Cancel" to dismiss dialog
+- Press Enter to confirm
+- Press Escape to cancel
+- Click outside modal to cancel (optional)
 
-**Input Fields:**
-- None (this is a confirmation dialog only)
-
-**Output/Displayed Data:**
-- **Dialog Title/Heading:** "Delete Requirement" or "Confirm Deletion"
-- **Message:** "Are you sure you want to delete this requirement?"
-- **Optional:** Display the requirement description being deleted for context
-- **Buttons:**
-  - Primary button: "Delete" (destructive action, may use warning color)
-  - Secondary button: "Cancel" (safe action)
-
-**Navigation:**
-- **From:** Main Application Screen (click "Delete" button on a requirement row)
-- **To:** Main Application Screen (after confirmation or cancellation)
-- **Trigger:** Clicking "Delete" button on any requirement
-- **Modal/Overlay:** Dialog appears as overlay above main screen
-
-**Error States:**
-- None (no user input to validate)
-
-**Success States:**
-- **Deletion confirmed:**
-  - Success indicator: None needed (immediate visual feedback)
-  - Actions:
-    - Requirement removed from list
-    - Total effort recalculates (if requirement was active)
-    - Data saved to local storage
-    - Dialog closes
-    - Return to Main Application Screen
-- **Deletion canceled:**
-  - Success indicator: None needed (immediate visual feedback)
-  - Actions:
-    - Requirement preserved unchanged
-    - Dialog closes
-    - Return to Main Application Screen
+**Exit Behavior:**
+- **Delete Confirmed:** Requirement removed from list, total recalculates, data saved, modal closes
+- **Canceled:** Modal closes, no changes
 
 ---
 
 ### Screen 6: Clear All Data Confirmation Dialog
 
-**Screen Name:** Clear All Data Confirmation
+**Implementation:** Modal overlay (same structure as delete confirmation)
 
-**Screen Purpose:**
-Confirms user intent before clearing all project data. Prevents accidental loss of entire project. Allows user to start fresh with new project.
+**Modal Styling:**
+- Same overlay and modal box as delete confirmation
+
+**Content:**
+
+**Icon:**
+- Emoji: 🗑️ (trash)
+- Font size: 48px
+- Text align: center
+- Margin bottom: 20px
+
+**Heading:**
+- Text: "Clear All Data"
+- Font size: 24px
+- Font weight: 700
+- Color: `#2d3748`
+- Text align: center
+
+**Message:**
+- Text: "Are you sure you want to clear all data? This action cannot be undone and will delete your project and all requirements."
+- Font size: 16px
+- Color: `#718096`
+- Line height: 1.5
+- Text align: center
+
+**Warning Box (Optional Enhancement):**
+- Background: `#fff5f5` (light red)
+- Border: 2px solid `#fed7d7`
+- Border radius: 12px
+- Padding: 16px
+- Margin bottom: 24px
+- Display: Flex, gap 12px
+
+**Warning Icon:** ⚠️ (24px)
+**Warning Text:**
+- Flex: 1
+- Color: `#742a2a` (dark red)
+- Font size: 14px
+- Line height: 1.4
+- Font weight: 500
+- Text: "This will permanently delete all your data from browser storage. You will not be able to recover it."
+
+**Action Buttons:**
+- Same layout as delete confirmation
+
+**Cancel Button:**
+- Same styling as delete confirmation
+
+**Clear All Button:**
+- Background: `#e53e3e` (solid red)
+- Color: white
+- Shadow: `0 4px 15px rgba(229, 62, 62, 0.4)`
+- Text: "Clear All"
 
 **User Interactions:**
-- Click/tap "Clear All" or "Delete Everything" button to confirm
-- Click/tap "Cancel" button to dismiss dialog
-- Press Enter to confirm (keyboard shortcut)
-- Press Escape to cancel (keyboard shortcut)
-- Click outside dialog to cancel (optional behavior)
+- Click "Clear All" to confirm
+- Click "Cancel" to dismiss
+- Press Enter to confirm
+- Press Escape to cancel
+- Click outside to cancel (optional)
 
-**Input Fields:**
-- None (this is a confirmation dialog only)
-
-**Output/Displayed Data:**
-- **Dialog Title/Heading:** "Clear All Data" or "Start New Project"
-- **Message:** "Are you sure you want to clear all data? This action cannot be undone."
-- **Warning indicator:** Visual emphasis (icon, color) indicating destructive action
-- **Buttons:**
-  - Primary button: "Clear All" or "Delete Everything" (destructive action, warning color)
-  - Secondary button: "Cancel" (safe action, more prominent)
-
-**Navigation:**
-- **From:** Main Application Screen (click "Clear All Data" or "New Project" control)
-- **To:**
-  - First-Time Setup Screen (if clear confirmed)
-  - Main Application Screen (if canceled)
-- **Trigger:** Clicking "Clear All Data" or "New Project" control on main screen
-- **Modal/Overlay:** Dialog appears as overlay above main screen
-
-**Error States:**
-- None (no user input to validate)
-
-**Success States:**
-- **Clear confirmed:**
-  - Success indicator: None needed (immediate transition)
-  - Actions:
-    - All requirements deleted
-    - Project name reset
-    - All data cleared from local storage
-    - Application returns to First-Time Setup Screen
-    - User prompted to enter new project name
-- **Clear canceled:**
-  - Success indicator: None needed (immediate visual feedback)
-  - Actions:
-    - All data preserved unchanged
-    - Dialog closes
-    - Return to Main Application Screen
+**Exit Behavior:**
+- **Clear Confirmed:** All data cleared from localStorage, redirect to first-time setup screen
+- **Canceled:** Modal closes, no changes
 
 ---
 
-## 3. Global UI Behaviors
+### Screen 7: Empty State & Inactive Requirements
 
-### 3.1 Data Persistence
-- **Timing:** All data changes save immediately to browser local storage
-- **Trigger Events:**
-  - Adding a requirement
-  - Editing a requirement
-  - Deleting a requirement
-  - Toggling requirement status
-  - Editing project name
-  - Toggling effort column visibility
-  - Changing any user preferences
-- **User Feedback:** No explicit "saving" indicator needed (saves are instantaneous and invisible)
+**Implementation:** States within main application screen
 
-### 3.2 Loading Behavior
-- **On Application Open:**
-  - Check local storage for existing data
-  - If data exists: Load and display on Main Application Screen
-  - If no data: Display First-Time Setup Screen
-- **Loading Indicator:** Optional, only if data loading is noticeably delayed
+**Empty State (No Requirements):**
+- Displayed in place of requirements table
+- Centered content
+- Padding: 60px 20px
+- Color: `#718096` (medium gray)
 
-### 3.3 Responsive Behavior
-- Application should work on desktop and mobile browsers
-- Touch-friendly controls (adequate tap target sizes)
-- Keyboard navigation support for desktop users
-- Mobile considerations:
-  - Numeric keyboard for effort input on mobile devices
-  - Touch-optimized status toggles (switches vs. checkboxes)
-  - Appropriate text input keyboards (default for descriptions)
+**Icon:**
+- Emoji: 📝 (memo)
+- Font size: 64px
+- Margin bottom: 16px
+- Opacity: 0.5
 
-### 3.4 Browser Compatibility
-- Must work in modern browsers (Chrome, Firefox, Safari, Edge)
-- Local storage support required
-- Graceful degradation if local storage unavailable (show warning message)
+**Message:**
+- Text: "No requirements yet. Add your first requirement above."
+- Font size: 18px
+- Line height: 1.5
 
-### 3.5 Accessibility Considerations
-- All interactive elements must be keyboard accessible
-- Form fields must have proper labels (visible or accessible labels)
-- Error messages must be associated with their input fields
-- Focus management during modal dialogs
-- Sufficient color contrast for text readability
-- Status toggles must be clearly labeled for screen readers
+**Inactive Requirements State:**
+- Requirements with status unchecked (inactive)
+- Visual indication: Row opacity 0.5 (50% transparent)
+- Row has class "inactive"
+- Checkbox is unchecked
+- Text remains readable
+- All other functionality available (edit, delete)
+- Not included in total effort calculation
+- Transition: all 0.3s ease (smooth opacity change)
+
+**Mixed Active/Inactive Display:**
+- Active rows: Full opacity (1.0)
+- Inactive rows: Reduced opacity (0.5)
+- Clear visual distinction
+- Status can be toggled by clicking checkbox
+- Immediate visual feedback on toggle
 
 ---
 
-## 4. Interaction Patterns Summary
+## 4. Global UI Behaviors
 
-### 4.1 Form Submission Patterns
-- **Add Requirement Form:** Submit via button click or Enter key press
-- **Edit Mode (Project Name & Requirements):** Save via button click or Enter key press
-- **Cancellation:** Cancel button or Escape key press
-- **Validation:** On submit attempt (not necessarily on blur or real-time, but design team may choose real-time feedback)
-- **Error Display:** Inline, near relevant fields
-- **Error Clearing:** On input change (errors disappear when user starts correcting)
+### 4.1 Data Persistence
 
-### 4.2 Confirmation Dialog Patterns
-- **Trigger:** Destructive actions (Delete, Clear All)
-- **Display:** Modal/overlay above main content
-- **Buttons:** Clear primary and secondary actions
-- **Dismissal:** Cancel button, Escape key, or click outside (design team choice)
-- **Visual Weight:** Destructive actions should be visually distinct but not the most prominent (secondary vs. primary button styling)
+**Implementation:**
+- Technology: Browser localStorage
+- Timing: Immediate on all data changes
+- No explicit "save" buttons or indicators
 
-### 4.3 Inline Editing Patterns
-- **Activation:** Click on editable element (project name) or click Edit button (requirements)
-- **Mode Change:** Element transforms into edit controls in place
-- **Focus Management:** Auto-focus on primary input field
-- **Single Edit:** Only one requirement in edit mode at a time
-- **Cancellation Behavior:** Discard changes, restore original values
+**Saved Data:**
+- Project name: `localStorage.setItem('projectName', value)`
+- Requirements array: `localStorage.setItem('requirements', JSON.stringify(array))`
+- Effort column visibility: `localStorage.setItem('effortColumnVisible', boolean)`
 
-### 4.4 Toggle Patterns
-- **Requirement Status Toggle:** Immediate effect, no confirmation
-- **Effort Column Visibility Toggle:** Immediate effect, no confirmation
-- **Visual Feedback:** Toggle control state changes immediately
-- **Data Impact:** Status toggles affect calculations, visibility toggles affect display only
+**Load Behavior:**
+- On application open: Check localStorage for existing data
+- If data exists: Load and display on main application screen
+- If no data: Show first-time setup screen
 
-### 4.5 List Display Patterns
-- **Empty State:** Friendly message guiding users to add first item
-- **Ordering:** Chronological (oldest first, newest last)
-- **Visual States:** Clear distinction between active and inactive items
-- **Row Actions:** Edit and Delete buttons visible on each row
-- **Status Indicator:** Toggle control visible on each row
+**Trigger Events for Saving:**
+- Adding a requirement
+- Editing a requirement
+- Deleting a requirement
+- Toggling requirement status
+- Editing project name
+- Toggling effort column visibility
+- Any user preference changes
 
-### 4.6 Calculation Display Patterns
-- **Real-Time Updates:** Total effort updates immediately on any relevant change
-- **Decimal Precision:** Display up to 2 decimal places (e.g., 13.75)
-- **Zero State:** Display "0" or "0.00" when no active requirements
-- **Visibility:** Total effort may remain visible even when effort column hidden (configurable)
+**User Feedback:**
+- No explicit "saving" indicator (saves are instantaneous)
+- Visual feedback through immediate UI updates
 
----
+### 4.2 Loading Behavior
 
-## 5. Data Validation Reference
+**On Application Open:**
+1. Check localStorage for 'projectName'
+2. Check localStorage for 'requirements'
+3. Check localStorage for 'effortColumnVisible'
+4. If project name exists: Display main application
+5. If no project name: Display first-time setup
+6. Restore all saved data and preferences
 
-### 5.1 Project Name Validation
-| Rule | Validation Message | Timing |
-|------|-------------------|--------|
-| Required (cannot be only whitespace) | "Project name cannot be empty" | On save attempt |
-| Max 100 characters | "Project name must not exceed 100 characters" | On save attempt |
+**Loading Indicators:**
+- None needed (data loading is instantaneous from localStorage)
+- Could add if data loading becomes noticeably delayed
 
-### 5.2 Requirement Description Validation
-| Rule | Validation Message | Timing |
-|------|-------------------|--------|
-| Required (cannot be empty or only whitespace) | "Requirement description is required" | On submit attempt |
-| Max 500 characters | "Description must not exceed 500 characters" | On submit attempt |
+### 4.3 Responsive Behavior
 
-### 5.3 Effort Value Validation
-| Rule | Validation Message | Timing |
-|------|-------------------|--------|
-| Required | "Effort value is required" | On submit attempt |
-| Must be numeric | "Effort must be a number" | On submit attempt |
-| Must be greater than 0 | "Effort must be greater than 0" | On submit attempt |
-| Max 1000 | "Effort must not exceed 1000" | On submit attempt |
+**Breakpoints:**
+- Desktop: > 768px
+- Mobile: ≤ 768px
+- Small Mobile: ≤ 600px
 
----
+**Desktop (>768px):**
+- Cards: 30px-40px padding
+- Project name: 32px
+- Form: Grid layout (2 columns)
+- Buttons: Side by side
+- Modal: 40px padding
+- Tables: Full width with all columns
 
-## 6. Screen Transitions Summary
+**Mobile (≤768px):**
+- Cards: 20px padding, 16px border radius
+- Project name: 24px
+- Form: Single column layout
+- Requirements table: Reduced padding (8px cells)
+- Font sizes: Slightly reduced (14px base)
+- Modal: 30px 20px padding
+- Modal buttons: Stack vertically
 
-| From Screen | To Screen | Trigger | Transition Type |
-|------------|-----------|---------|-----------------|
-| Application Entry | First-Time Setup | No saved data exists | Load |
-| Application Entry | Main Application | Saved data exists | Load |
-| First-Time Setup | Main Application | User enters/skips project name | Navigate |
-| Main Application | Project Name Edit Mode | Click project name | Inline transformation |
-| Project Name Edit Mode | Main Application | Save or Cancel | Inline transformation |
-| Main Application | Requirement Edit Mode | Click Edit button | Inline row transformation |
-| Requirement Edit Mode | Main Application | Save or Cancel | Inline row transformation |
-| Main Application | Delete Confirmation Dialog | Click Delete button | Modal overlay |
-| Delete Confirmation Dialog | Main Application | Confirm or Cancel | Dismiss modal |
-| Main Application | Clear All Confirmation Dialog | Click Clear All Data | Modal overlay |
-| Clear All Confirmation Dialog | Main Application | Cancel | Dismiss modal |
-| Clear All Confirmation Dialog | First-Time Setup | Confirm | Navigate |
+**Small Mobile (≤600px):**
+- Setup card: 40px 24px padding
+- Setup heading: 26px
+- Button groups: Flex direction column
+- Full stacking of elements
 
----
+**Touch Optimization:**
+- Minimum tap targets: ~44px (buttons, checkboxes)
+- Adequate spacing between interactive elements
+- Touch-friendly toggle switches
+- No hover-dependent interactions
 
-## 7. Component Inventory
+**Input Types:**
+- Number inputs: Numeric keyboard on mobile (type="number")
+- Text inputs: Default keyboard
+- Textareas: Default keyboard with resizing
 
-### 7.1 Core UI Components Needed
-- **Text Input Fields** (single-line and optionally multi-line)
-- **Number Input Fields** (with decimal support)
-- **Buttons** (primary, secondary, destructive)
-- **Toggle Controls** (checkbox or switch for status)
-- **Modal Dialogs** (for confirmations)
-- **Table/List Display** (for requirements)
-- **Headings** (for project name display)
-- **Inline Edit Controls** (input fields with save/cancel buttons)
-- **Error Message Display** (inline with forms)
-- **Empty State Messages** (for empty list)
+### 4.4 Browser Compatibility
 
-### 7.2 Layout Sections
-- **Header Section:** Project name display/edit
-- **Add Form Section:** Input fields and add button
-- **Control Section:** Effort visibility toggle, clear all data button
-- **List Section:** Requirements table/list with columns
-- **Summary Section:** Total effort display
-- **Modal Overlays:** Confirmation dialogs
+**Requirements:**
+- Modern browsers: Chrome, Firefox, Safari, Edge (latest versions)
+- localStorage support required
+- CSS grid and flexbox support required
+- CSS custom properties support required
 
----
+**Features Used:**
+- CSS Grid
+- CSS Flexbox
+- CSS backdrop-filter (glassmorphism)
+- CSS transitions and animations
+- localStorage API
+- ES6 JavaScript
 
-## 8. User Assistance and Feedback
+**Graceful Degradation:**
+- If localStorage unavailable: Show warning message
+- Backdrop blur: Falls back to solid background if not supported
 
-### 8.1 Empty States
-- **No Requirements:** "No requirements yet. Add your first requirement above."
-- **All Requirements Inactive:** List shows requirements but total effort displays 0
+### 4.5 Accessibility Considerations
 
-### 8.2 Validation Feedback
-- **Timing:** On submit/save attempt
-- **Placement:** Inline, near relevant input field
-- **Appearance:** Distinct styling (color, icon) to indicate error
-- **Clearing:** Automatically disappear when user corrects input
+**Keyboard Navigation:**
+- All interactive elements accessible via Tab key
+- Enter key: Submit forms, save edits, confirm dialogs
+- Escape key: Cancel edits, close modals
+- Tab order: Logical and intuitive
 
-### 8.3 Destructive Action Warnings
-- **Delete Requirement:** Confirmation dialog with clear warning
-- **Clear All Data:** Confirmation dialog with emphasis on irreversibility
+**Form Fields:**
+- All inputs have associated labels (visible or accessible)
+- Placeholder text for guidance
+- Error messages associated with fields
+- Clear focus indicators (shadow rings)
 
-### 8.4 Visual Feedback
-- **Status Changes:** Immediate visual update (row appearance, toggle state)
-- **Column Visibility:** Immediate show/hide with layout reflow
-- **List Updates:** Immediate display of added/edited/deleted items
-- **Calculation Updates:** Immediate update of total effort value
+**Focus Management:**
+- Auto-focus on primary fields when entering modes
+- Focus returns to appropriate element after actions
+- Modal focus trap (when open, focus stays within modal)
 
----
+**Color Contrast:**
+- Text contrast meets WCAG AA standards
+- Primary text: #2d3748 on white (14.8:1)
+- Labels: #4a5568 on white (10.6:1)
+- Light text: #718096 on white (7.0:1)
 
-## 9. Edge Cases and Special Scenarios
+**Screen Readers:**
+- Status toggles labeled clearly (checkbox with label)
+- Button text describes action
+- Error messages readable by screen readers
+- Semantic HTML structure (header, main, section elements where appropriate)
 
-### 9.1 Data Edge Cases
-| Scenario | Expected Behavior |
-|----------|------------------|
-| No active requirements | Total effort displays as 0 |
-| All requirements inactive | Total effort displays as 0, list shows all requirements grayed out |
-| All requirements deleted | Empty state message appears, total effort displays as 0 |
-| Decimal effort values (e.g., 0.5, 13.75) | Accepted, calculated correctly, displayed with up to 2 decimal places |
-| Very long requirement description (near 500 chars) | Accepted if within limit, displayed fully (may wrap or truncate with ellipsis) |
-| Effort column hidden | Column and header removed, description column expands, total may remain visible |
-| Browser storage cleared externally | Application resets to First-Time Setup Screen on next load |
-| Browser storage full | Current data remains, new saves may fail (out of scope for MVP) |
-
-### 9.2 Interaction Edge Cases
-| Scenario | Expected Behavior |
-|----------|------------------|
-| Editing one requirement while another is in edit mode | First edit is automatically canceled, second edit mode activates |
-| Pressing Escape during edit | Edit canceled, original values preserved |
-| Pressing Enter in project name edit | Save attempted with validation |
-| Clicking outside modal dialog | Dialog closes/cancels (optional design choice) |
-| Rapid-fire adding requirements | Each submission processed sequentially, all saved |
-| Editing requirement while add form has unsaved data | Both can coexist, no conflict (add form and edit row are separate) |
-
-### 9.3 Browser Behavior Edge Cases
-| Scenario | Expected Behavior |
-|----------|------------------|
-| Page refresh during edit | Edit canceled, original data preserved from local storage |
-| Browser back button | No navigation history within app (single-page), browser navigates away from app |
-| Multiple tabs open | Each tab operates independently, last save wins (no conflict resolution in MVP) |
-| Browser local storage disabled | Application shows error message, cannot function without storage |
+**Interactive Elements:**
+- Adequate size (min 20px for checkboxes, 44px recommended for buttons)
+- Clear hover and focus states
+- Disabled states clearly indicated
 
 ---
 
-## 10. Design Team Considerations
+## 5. Interaction Patterns Summary
 
-### 10.1 What This Document Defines
-- All screens and their purpose
-- User interactions and navigation flows
-- Input fields, validation rules, and data requirements
-- Error states and success states
-- Functional behavior and data display logic
-- Interaction patterns and user feedback
+### 5.1 Form Submission Patterns
 
-### 10.2 What Design Team Will Define
-- Visual layout and positioning of elements
-- Spacing, margins, padding, grid systems
-- Color schemes, typography, font sizes
-- Visual styling of components (buttons, inputs, toggles)
-- Iconography and visual indicators
-- Animation and transitions (optional)
-- Responsive breakpoints and layouts
-- Accessibility implementation details (ARIA attributes, focus indicators)
-- Component library selection or custom component design
+**Add Requirement Form:**
+- Submit via: Button click OR Enter key press
+- Validation: On submit attempt
+- Error display: Inline, below fields
+- Error clearing: On input change
+- Success: Clear fields, add to list, focus to first field
 
-### 10.3 Design Decisions to Consider
-1. **Project Name Edit:** Inline edit vs. modal dialog?
-2. **Status Toggle:** Checkbox vs. switch control?
-3. **Requirement Description:** Single-line vs. multi-line text input?
-4. **Mobile Layout:** Stacked form vs. side-by-side layout?
-5. **Effort Column Toggle:** Button vs. checkbox vs. menu item?
-6. **Delete Confirmation:** Modal dialog vs. inline confirmation?
-7. **Error Messages:** Inline vs. toast notifications?
-8. **Empty State:** Text only vs. illustration + text?
-9. **Total Effort Display:** Card vs. inline section vs. sticky header?
-10. **Clear All Data Control:** Prominent vs. hidden in menu/settings?
+**Inline Editing (Project Name & Requirements):**
+- Activate: Click element or Edit button
+- Edit mode: Inline transformation
+- Save via: Button click OR Enter key
+- Cancel via: Button click OR Escape key
+- Validation: On save attempt
+- Success: Exit edit mode, update display
+
+**Modal Confirmations:**
+- Show: On destructive action triggers
+- Confirm via: Button click OR Enter key
+- Cancel via: Button click OR Escape key OR click outside
+- Success: Execute action, close modal
+
+### 5.2 Toggle Patterns
+
+**Status Toggle (Checkbox):**
+- Component: Native checkbox with accent-color
+- Behavior: Click to toggle
+- Feedback: Immediate state change, opacity change on row
+- Side effect: Total effort recalculates
+
+**Effort Visibility Toggle (Custom Switch):**
+- Component: Custom CSS toggle switch
+- Behavior: Click anywhere on switch or label
+- Feedback: Animated slider movement, color change
+- Side effect: Column visibility, label text change
+
+### 5.3 Visual Feedback Patterns
+
+**Hover States:**
+- Buttons: Lift 2px, shadow increase
+- Table rows: Background color change
+- Links: Color change, underline
+- Project name: Background tint, color change
+
+**Focus States:**
+- Inputs: Border color change, shadow ring (3px blur)
+- Buttons: Browser default or custom outline
+
+**Active States:**
+- Buttons: Reset position (translateY(0))
+- Checkboxes: Checked state with accent color
+
+**Transitions:**
+- Standard duration: 0.3s
+- Easing: ease
+- Properties: all (or specific properties)
+
+### 5.4 Error Handling Patterns
+
+**Display Location:**
+- Form errors: Inline below field
+- Modal errors: Could use alert() or inline (current implementation uses alert)
+
+**Error Appearance:**
+- Color: `#e53e3e` (red)
+- Font size: 13px-14px
+- Position: Below or adjacent to field
+- Border: Input border turns red
+
+**Error Clearing:**
+- Trigger: Input event (as user types)
+- Behavior: Hide error message, remove red border
+
+**Multiple Errors:**
+- Both field errors can show simultaneously
+- Each error near its respective field
+
+### 5.5 Success Feedback Patterns
+
+**Implicit Success:**
+- No explicit success message
+- Visual confirmation through UI update
+- Example: New item appears in list immediately
+
+**Explicit Success:**
+- Not currently implemented
+- Could add toast notifications for explicit confirmation
+
+### 5.6 Modal Dialog Patterns
+
+**Structure:**
+- Overlay: Fixed position, semi-transparent black
+- Box: Centered, white background, rounded corners
+- Animation: Scale up from 0.9 to 1.0, fade in
+
+**Content Order:**
+1. Icon (emoji, large)
+2. Heading (bold, centered)
+3. Message (medium weight, centered, gray)
+4. Optional warning box
+5. Action buttons (flex, equal width or stacked)
+
+**Button Order:**
+- Desktop: Cancel (left), Destructive (right)
+- Mobile: Destructive (top), Cancel (bottom) - reversed for thumb access
+
+**Dismissal:**
+- Cancel button
+- Escape key
+- Click outside (optional, implemented)
 
 ---
 
-## Document Revision History
+## 6. Implementation Notes
+
+### 6.1 Technology Stack
+
+**HTML:**
+- Semantic HTML5
+- Form elements with proper types
+- Accessibility attributes
+
+**CSS:**
+- Modern CSS3 features
+- Flexbox and Grid layouts
+- Custom properties (CSS variables) possible but not used
+- Transitions and animations
+- Media queries for responsive design
+- Glassmorphism (backdrop-filter)
+
+**JavaScript:**
+- Vanilla JavaScript (no frameworks)
+- ES6+ features
+- localStorage API
+- Event listeners
+- DOM manipulation
+- JSON parsing/stringifying
+
+**Browser APIs:**
+- localStorage
+- Window location (navigation)
+- Form validation API
+
+### 6.2 File Structure
+
+**Prototypes:**
+- `01-first-time-setup.html` - Setup screen
+- `02-main-application.html` - Main dashboard (fully functional)
+- `03-state-project-name-edit.html` - Static state reference
+- `04-state-requirement-edit.html` - Static state reference
+- `05-state-delete-confirmation.html` - Static state reference
+- `06-state-clear-all-confirmation.html` - Static state reference
+- `07-state-empty-and-inactive.html` - Static state reference
+- `index.html` - Navigation hub
+- `README.md` - Documentation
+
+**Implementation:**
+- All files are self-contained (inline CSS and JavaScript)
+- No external dependencies
+- No build process required
+- Can be opened directly in browser
+
+### 6.3 Data Model
+
+**Project Data:**
+```javascript
+{
+  projectName: String // Stored separately in localStorage
+}
+```
+
+**Requirements Array:**
+```javascript
+[
+  {
+    id: Number, // Unique identifier (timestamp)
+    description: String, // Requirement text
+    effort: Number, // Effort value (decimal allowed)
+    active: Boolean, // true = Active, false = Inactive
+    createdAt: String, // ISO timestamp
+    lastModified: String // ISO timestamp
+  }
+]
+```
+
+**Preferences:**
+```javascript
+{
+  effortColumnVisible: Boolean // true = shown, false = hidden
+}
+```
+
+### 6.4 LocalStorage Keys
+
+- `'projectName'` - String
+- `'requirements'` - JSON string (array)
+- `'effortColumnVisible'` - String "true" or "false"
+
+### 6.5 Key JavaScript Functions
+
+**Main Application (02-main-application.html):**
+
+**State Management:**
+- `init()` - Initialize application
+- `loadData()` - Load from localStorage
+- `saveData()` - Save to localStorage
+
+**Project Name:**
+- `updateProjectNameDisplay()` - Update DOM
+- `editProjectName()` - Enter edit mode
+- `saveProjectName()` - Save changes
+- `cancelProjectNameEdit()` - Cancel editing
+
+**Requirements CRUD:**
+- `addRequirement(event)` - Add new requirement
+- `renderRequirements()` - Update list display
+- `renderRequirementRow(req)` - Single row HTML
+- `renderEditRow(req)` - Edit mode HTML
+- `toggleRequirementStatus(id)` - Toggle active/inactive
+- `startEditRequirement(id)` - Enter edit mode
+- `saveEditRequirement(id)` - Save edited requirement
+- `cancelEditRequirement()` - Cancel editing
+- `showDeleteModal(id)` - Show delete confirmation
+- `confirmDelete()` - Execute deletion
+
+**Calculations:**
+- `updateTotalEffort()` - Recalculate and update display
+
+**UI Controls:**
+- `toggleEffortVisibility()` - Show/hide column
+- `updateEffortColumnVisibility()` - Update DOM
+- `showClearAllModal()` - Show clear confirmation
+- `confirmClearAll()` - Execute clear all
+
+**Utilities:**
+- `escapeHtml(text)` - Prevent XSS in user input
+
+### 6.6 Validation Implementation
+
+**Client-Side Only:**
+- All validation in JavaScript
+- No server-side validation (no server)
+
+**Validation Rules:**
+- Max length checked with `maxlength` attribute and JS
+- Required fields checked in submit handler
+- Numeric validation with `type="number"` and JS checks
+- Min/max values enforced in JS
+
+**Error Display:**
+- Error elements exist in HTML (hidden by default)
+- JavaScript adds/removes `.show` class
+- JavaScript adds/removes `.error` class on inputs
+
+### 6.7 Known Limitations
+
+**Data Persistence:**
+- Data only saved locally (no cloud backup)
+- Clearing browser data deletes all
+- No sync between devices
+- No export/import functionality
+
+**Concurrency:**
+- Multiple tabs: Last write wins (no conflict resolution)
+- No real-time sync between tabs
+
+**Validation:**
+- Client-side only (no server validation)
+- Users can manipulate localStorage directly
+
+**Browser Support:**
+- Requires modern browser
+- No IE11 support
+- Requires JavaScript enabled
+- Requires localStorage available
+
+**Accessibility:**
+- Basic accessibility implemented
+- Could be enhanced with ARIA attributes
+- Screen reader testing needed
+
+### 6.8 Future Enhancements (Not Implemented)
+
+**Features:**
+- Export/import data (JSON, CSV)
+- Print view
+- Keyboard shortcuts reference
+- Undo/redo functionality
+- Drag-and-drop reordering
+- Bulk operations (select multiple, bulk delete)
+- Search/filter requirements
+- Sorting options
+- Multiple projects
+- Data backup to cloud
+
+**UI Improvements:**
+- Toast notifications for success messages
+- Loading indicators (if needed)
+- Animations on add/delete
+- Custom confirmation modals (instead of alert)
+- Inline validation (real-time as user types)
+- Character counters for text inputs
+- Tooltips for buttons
+- Dark mode toggle
+
+**Technical:**
+- Progressive Web App (PWA)
+- Offline support
+- Service Worker
+- Framework migration (React, Vue, etc.)
+- Backend API integration
+- Database persistence
+- User authentication
+- Multi-user collaboration
+
+---
+
+## Revision History
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
 | 1.0 | 2025-12-19 | AI Assistant | Initial UX/UI requirements document created from functional requirements |
+| 2.0 | 2025-12-19 | AI Assistant | Updated to reflect actual HTML prototypes implementation with detailed visual design specifications |
 
 ---
 
-## Appendix: Glossary
+## Appendix: Component Reference
 
-- **Active Status:** A requirement included in the total effort calculation
-- **Inactive Status:** A requirement excluded from the total effort calculation
-- **Inline Edit:** Editing an element directly in place without navigating to a separate screen
-- **Modal Dialog:** An overlay window that appears above the main interface, requiring user interaction
-- **Local Storage:** Browser-based data persistence mechanism
-- **Validation:** Process of checking user input against defined rules
-- **Empty State:** UI display when no data exists in a list or collection
-- **Toggle Control:** UI element for switching between two states (on/off, active/inactive)
-- **Destructive Action:** An action that permanently deletes or removes data
-- **Real-Time Update:** UI changes that occur immediately in response to user actions without page refresh
+### Button Styles
+
+**Primary Button:**
+```css
+background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+color: white;
+padding: 12px 24px;
+border-radius: 12px;
+font-size: 16px;
+font-weight: 600;
+box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+/* Hover: lift 2px, increase shadow */
+```
+
+**Secondary Button:**
+```css
+background: white;
+color: #718096;
+border: 2px solid #e2e8f0;
+padding: 12px 24px;
+border-radius: 12px;
+font-size: 16px;
+font-weight: 600;
+/* Hover: background #f7fafc */
+```
+
+**Danger Button:**
+```css
+background: white (or #e53e3e for solid);
+color: #e53e3e (or white for solid);
+border: 2px solid #fed7d7;
+padding: 12px 24px;
+border-radius: 12px;
+font-size: 16px;
+font-weight: 600;
+/* Hover: background #fff5f5, border #fc8181 */
+```
+
+**Small Button:**
+```css
+padding: 8px 16px;
+font-size: 14px;
+/* Other properties inherited from button type */
+```
+
+**Icon Button:**
+```css
+padding: 6px 12px;
+border: none;
+border-radius: 8px;
+font-size: 13px;
+font-weight: 600;
+/* Edit: background #edf2f7, color #667eea */
+/* Delete: background #fff5f5, color #e53e3e */
+```
+
+### Input Field Style
+
+```css
+width: 100%;
+padding: 12px 16px (or 14px 16px for larger);
+border: 2px solid #e2e8f0;
+border-radius: 12px;
+font-size: 16px;
+background: white;
+transition: all 0.3s ease;
+
+/* Focus */
+border-color: #667eea;
+box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+
+/* Error */
+border-color: #e53e3e;
+```
+
+### Card Style
+
+```css
+background: rgba(255, 255, 255, 0.95);
+backdrop-filter: blur(10px);
+border-radius: 20px;
+padding: 30px 40px;
+box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+```
+
+### Modal Style
+
+```css
+/* Overlay */
+position: fixed;
+top: 0; left: 0; right: 0; bottom: 0;
+background: rgba(0, 0, 0, 0.5);
+display: flex;
+align-items: center;
+justify-content: center;
+z-index: 1000;
+
+/* Box */
+background: white;
+border-radius: 20px;
+padding: 40px;
+max-width: 500px;
+width: 100%;
+box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+animation: modalSlideIn 0.3s ease;
+```
 
 ---
 
 **End of Document**
+
+**Note:** This document accurately reflects the HTML prototypes located in `/ui-prototypes/`. For actual implementation code, refer to the prototype files. For functional requirements, refer to `/docs/requirement.md`.

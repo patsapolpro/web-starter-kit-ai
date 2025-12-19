@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UI Prototypes - Requirement & Effort Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #2d3748;
+            font-size: 36px;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            color: #718096;
+            font-size: 18px;
+            line-height: 1.6;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+        }
+
+        .section h2 {
+            color: #2d3748;
+            font-size: 24px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-icon {
+            font-size: 28px;
+        }
+
+        .prototype-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 16px;
+        }
+
+        .prototype-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+        }
+
+        .prototype-card:hover {
+            border-color: #667eea;
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(102, 126, 234, 0.2);
+        }
+
+        .prototype-card.featured {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+        }
+
+        .prototype-card.featured:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(102, 126, 234, 0.4);
+        }
+
+        .prototype-number {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 32px;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .prototype-card.featured .prototype-number {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .prototype-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+
+        .prototype-card.featured .prototype-title {
+            color: white;
+        }
+
+        .prototype-description {
+            font-size: 14px;
+            color: #718096;
+            line-height: 1.5;
+        }
+
+        .prototype-card.featured .prototype-description {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 12px;
+        }
+
+        .badge-interactive {
+            background: #c3dafe;
+            color: #2c5282;
+        }
+
+        .badge-static {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .prototype-card.featured .badge {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            border-radius: 16px;
+            padding: 24px;
+            color: white;
+            margin-top: 20px;
+        }
+
+        .info-box h3 {
+            font-size: 20px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-box p {
+            font-size: 14px;
+            line-height: 1.6;
+            opacity: 0.95;
+        }
+
+        .info-box ul {
+            margin-top: 12px;
+            margin-left: 20px;
+        }
+
+        .info-box li {
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: white;
+            font-size: 14px;
+        }
+
+        .footer a {
+            color: white;
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 28px;
+            }
+
+            .section {
+                padding: 20px;
+            }
+
+            .prototype-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-icon">🎨</div>
+            <h1>UI Prototypes</h1>
+            <p class="subtitle">Requirement & Effort Tracker MVP<br>Interactive HTML mockups for design and testing</p>
+        </div>
+
+        <!-- Core Screens Section -->
+        <div class="section">
+            <h2>
+                <span class="section-icon">🖥️</span>
+                Core Screens
+            </h2>
+            <div class="prototype-grid">
+                <a href="01-first-time-setup.html" class="prototype-card">
+                    <div class="prototype-number">01</div>
+                    <div class="prototype-title">First-Time Setup</div>
+                    <div class="prototype-description">Initial onboarding screen for new users. Project name input with validation and skip functionality.</div>
+                    <span class="badge badge-interactive">Interactive</span>
+                </a>
+
+                <a href="02-main-application.html" class="prototype-card featured">
+                    <div class="prototype-number">02</div>
+                    <div class="prototype-title">Main Application ⭐</div>
+                    <div class="prototype-description">Fully functional prototype with all features: add, edit, delete requirements, toggle status, calculate effort, and more!</div>
+                    <span class="badge">✨ Fully Interactive</span>
+                </a>
+            </div>
+
+            <div class="info-box">
+                <h3>💡 Start Here!</h3>
+                <p>
+                    Begin with <strong>02-main-application.html</strong> for the complete interactive experience.
+                    This prototype includes all functionality and demonstrates the full user workflow.
+                </p>
+            </div>
+        </div>
+
+        <!-- State Variations Section -->
+        <div class="section">
+            <h2>
+                <span class="section-icon">🎭</span>
+                State Variations
+            </h2>
+            <p style="color: #718096; margin-bottom: 20px; font-size: 14px;">
+                Static prototypes showing specific UI states for design reference. These complement the interactive main application.
+            </p>
+            <div class="prototype-grid">
+                <a href="03-state-project-name-edit.html" class="prototype-card">
+                    <div class="prototype-number">03</div>
+                    <div class="prototype-title">Project Name Edit Mode</div>
+                    <div class="prototype-description">Shows the project name in edit state with save and cancel actions.</div>
+                    <span class="badge badge-static">Static State</span>
+                </a>
+
+                <a href="04-state-requirement-edit.html" class="prototype-card">
+                    <div class="prototype-number">04</div>
+                    <div class="prototype-title">Requirement Edit Mode</div>
+                    <div class="prototype-description">Displays a requirement row in inline edit mode with expanded controls.</div>
+                    <span class="badge badge-static">Static State</span>
+                </a>
+
+                <a href="05-state-delete-confirmation.html" class="prototype-card">
+                    <div class="prototype-number">05</div>
+                    <div class="prototype-title">Delete Confirmation</div>
+                    <div class="prototype-description">Modal dialog for confirming requirement deletion with warning message.</div>
+                    <span class="badge badge-static">Static State</span>
+                </a>
+
+                <a href="06-state-clear-all-confirmation.html" class="prototype-card">
+                    <div class="prototype-number">06</div>
+                    <div class="prototype-title">Clear All Confirmation</div>
+                    <div class="prototype-description">Modal dialog for confirming clear all data action with strong warnings.</div>
+                    <span class="badge badge-static">Static State</span>
+                </a>
+
+                <a href="07-state-empty-and-inactive.html" class="prototype-card">
+                    <div class="prototype-number">07</div>
+                    <div class="prototype-title">Empty & Inactive States</div>
+                    <div class="prototype-description">Shows empty state (no requirements) and visual distinction for inactive requirements.</div>
+                    <span class="badge badge-static">Static State</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Quick Guide Section -->
+        <div class="section">
+            <h2>
+                <span class="section-icon">📖</span>
+                Quick Guide
+            </h2>
+            <div style="color: #4a5568; font-size: 15px; line-height: 1.7;">
+                <p style="margin-bottom: 16px;">
+                    <strong>For Designers:</strong> Use these prototypes as reference for creating high-fidelity mockups.
+                    The interactive prototype demonstrates all functional requirements and interaction patterns.
+                </p>
+                <p style="margin-bottom: 16px;">
+                    <strong>For Developers:</strong> The main application prototype shows expected behavior and validation rules.
+                    Use it to understand user flows and data interactions.
+                </p>
+                <p style="margin-bottom: 16px;">
+                    <strong>For Testing:</strong> The interactive prototype can be used for user testing and stakeholder demos.
+                    All features are functional including data persistence via localStorage.
+                </p>
+                <p>
+                    <strong>Documentation:</strong> See <code>README.md</code> in this directory for detailed information,
+                    and <code>/docs/ui-requirement.md</code> for complete UI specifications.
+                </p>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <div class="section">
+            <h2>
+                <span class="section-icon">✨</span>
+                Key Features Demonstrated
+            </h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px;">
+                <div style="background: #f7fafc; padding: 20px; border-radius: 12px;">
+                    <div style="font-size: 24px; margin-bottom: 8px;">📝</div>
+                    <div style="font-weight: 600; color: #2d3748; margin-bottom: 4px;">CRUD Operations</div>
+                    <div style="font-size: 14px; color: #718096;">Add, edit, delete requirements with validation</div>
+                </div>
+                <div style="background: #f7fafc; padding: 20px; border-radius: 12px;">
+                    <div style="font-size: 24px; margin-bottom: 8px;">🔄</div>
+                    <div style="font-weight: 600; color: #2d3748; margin-bottom: 4px;">Status Toggle</div>
+                    <div style="font-size: 14px; color: #718096;">Activate/deactivate requirements dynamically</div>
+                </div>
+                <div style="background: #f7fafc; padding: 20px; border-radius: 12px;">
+                    <div style="font-size: 24px; margin-bottom: 8px;">🧮</div>
+                    <div style="font-weight: 600; color: #2d3748; margin-bottom: 4px;">Real-time Calculation</div>
+                    <div style="font-size: 14px; color: #718096;">Automatic total effort updates</div>
+                </div>
+                <div style="background: #f7fafc; padding: 20px; border-radius: 12px;">
+                    <div style="font-size: 24px; margin-bottom: 8px;">✅</div>
+                    <div style="font-weight: 600; color: #2d3748; margin-bottom: 4px;">Form Validation</div>
+                    <div style="font-size: 14px; color: #718096;">Inline error messages and feedback</div>
+                </div>
+                <div style="background: #f7fafc; padding: 20px; border-radius: 12px;">
+                    <div style="font-size: 24px; margin-bottom: 8px;">💾</div>
+                    <div style="font-weight: 600; color: #2d3748; margin-bottom: 4px;">Data Persistence</div>
+                    <div style="font-size: 14px; color: #718096;">localStorage for browser-based saving</div>
+                </div>
+                <div style="background: #f7fafc; padding: 20px; border-radius: 12px;">
+                    <div style="font-size: 24px; margin-bottom: 8px;">📱</div>
+                    <div style="font-weight: 600; color: #2d3748; margin-bottom: 4px;">Responsive Design</div>
+                    <div style="font-size: 14px; color: #718096;">Mobile and desktop optimized</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>🎨 UI Prototypes for Requirement & Effort Tracker MVP</p>
+            <p style="margin-top: 8px; opacity: 0.8;">
+                See <a href="README.md">README.md</a> for detailed documentation
+            </p>
+            <p style="margin-top: 4px; font-size: 12px; opacity: 0.7;">
+                Version 1.0 | Generated 2025-12-19
+            </p>
+        </div>
+    </div>
+</body>
+</html>
