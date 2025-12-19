@@ -1,103 +1,126 @@
-import Image from "next/image";
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { ProjectHeader } from '@/components/ProjectHeader/ProjectHeader';
+import { TotalEffortCard } from '@/components/TotalEffort/TotalEffortCard';
+import { RequirementForm } from '@/components/RequirementForm/RequirementForm';
+import { RequirementsList } from '@/components/RequirementsList/RequirementsList';
+import { Modal } from '@/components/UI/Modal';
+import { useProject } from '@/hooks/useProject';
+import { useRequirements } from '@/hooks/useRequirements';
+import { usePreferences } from '@/hooks/usePreferences';
+import { clearAllData } from '@/lib/storage/localStorage';
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const router = useRouter();
+  const { project, updateProjectName, isLoading } = useProject();
+  const {
+    requirements,
+    addRequirement,
+    updateRequirement,
+    deleteRequirement,
+    toggleStatus,
+    totalActiveEffort,
+  } = useRequirements();
+  const { preferences, updatePreferences } = usePreferences();
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [clearAllModalOpen, setClearAllModalOpen] = useState(false);
+  const [requirementToDelete, setRequirementToDelete] = useState<string | null>(null);
+
+  // Redirect to setup page if no project exists
+  useEffect(() => {
+    if (!isLoading && !project) {
+      router.push('/setup');
+    }
+  }, [isLoading, project, router]);
+
+  const handleDeleteClick = (id: string) => {
+    setRequirementToDelete(id);
+    setDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (requirementToDelete) {
+      deleteRequirement(requirementToDelete);
+      setRequirementToDelete(null);
+    }
+  };
+
+  const handleConfirmClearAll = () => {
+    clearAllData();
+    window.location.reload();
+  };
+
+  const handleToggleEffortVisibility = () => {
+    updatePreferences({
+      effortColumnVisible: !preferences.effortColumnVisible,
+    });
+  };
+
+  // Show loading or empty state while checking for project
+  if (isLoading || !project) {
+    return (
+      <main className="min-h-screen bg-gradient-to-br from-[#667eea] to-[#764ba2] py-8 px-5 flex items-center justify-center">
+        <div className="text-white text-xl">Loading...</div>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+    );
+  }
+
+  return (
+    <main className="min-h-screen bg-gradient-to-br from-[#667eea] to-[#764ba2] py-8 px-5">
+      <div className="max-w-6xl mx-auto">
+        <ProjectHeader
+          projectName={project?.name || 'Untitled Project'}
+          onProjectNameUpdate={updateProjectName}
+          onClearAllClick={() => setClearAllModalOpen(true)}
+        />
+
+        <TotalEffortCard
+          totalEffort={totalActiveEffort}
+          visible={
+            preferences.effortColumnVisible || preferences.showTotalWhenEffortHidden
+          }
+        />
+
+        <RequirementForm onAddRequirement={addRequirement} />
+
+        <RequirementsList
+          requirements={requirements}
+          effortColumnVisible={preferences.effortColumnVisible}
+          onToggleStatus={toggleStatus}
+          onEdit={updateRequirement}
+          onDelete={handleDeleteClick}
+          onToggleEffortVisibility={handleToggleEffortVisibility}
+        />
+
+        {/* Delete Confirmation Modal */}
+        <Modal
+          isOpen={deleteModalOpen}
+          onClose={() => setDeleteModalOpen(false)}
+          title="Delete Requirement"
+          message="Are you sure you want to delete this requirement? This action cannot be undone."
+          confirmText="Delete"
+          cancelText="Cancel"
+          onConfirm={handleConfirmDelete}
+          variant="danger"
+          icon="⚠️"
+        />
+
+        {/* Clear All Confirmation Modal */}
+        <Modal
+          isOpen={clearAllModalOpen}
+          onClose={() => setClearAllModalOpen(false)}
+          title="Clear All Data"
+          message="Are you sure you want to clear all data? This action cannot be undone and will delete your project and all requirements."
+          confirmText="Clear All"
+          cancelText="Cancel"
+          onConfirm={handleConfirmClearAll}
+          variant="danger"
+          icon="🗑️"
+        />
+      </div>
+    </main>
   );
 }
