@@ -9,9 +9,9 @@ import { useLanguage } from '@/hooks/useLanguage';
 interface RequirementsListProps {
   requirements: Requirement[];
   effortColumnVisible: boolean;
-  onToggleStatus: (id: string) => void;
-  onEdit: (id: string, updates: Partial<Requirement>) => void;
-  onDelete: (id: string) => void;
+  onToggleStatus: (id: number) => void;
+  onEdit: (id: number, updates: Partial<Requirement>) => void;
+  onDelete: (id: number) => void;
 }
 
 export function RequirementsList({
@@ -23,12 +23,12 @@ export function RequirementsList({
 }: RequirementsListProps) {
   const { t } = useLanguage();
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
+  const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
 
   const activeCount = requirements.filter((r) => r.isActive).length;
   const inactiveCount = requirements.length - activeCount;
 
-  const handleDeleteClick = (id: string) => {
+  const handleDeleteClick = (id: number) => {
     setDeleteTargetId(id);
     setDeleteModalOpen(true);
   };

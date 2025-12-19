@@ -11,12 +11,11 @@ import { RequirementForm } from '@/components/RequirementForm/RequirementForm';
 import { RequirementsList } from '@/components/RequirementsList/RequirementsList';
 import { TotalEffortCard } from '@/components/TotalEffort/TotalEffortCard';
 import { Modal } from '@/components/UI/Modal';
-import { clearAll } from '@/lib/storage/localStorage';
 
 export default function HomePage() {
   const router = useRouter();
   const { t } = useLanguage();
-  const { project, isLoading: projectLoading, updateProjectName } = useProject();
+  const { project, isLoading: projectLoading, updateProjectName, error: projectError } = useProject();
   const {
     requirements,
     isLoading: requirementsLoading,
@@ -25,9 +24,11 @@ export default function HomePage() {
     deleteRequirement,
     toggleStatus,
     totalActiveEffort,
+    error: requirementsError,
   } = useRequirements();
-  const { preferences, updatePreferences } = usePreferences();
+  const { preferences, updatePreferences, isLoading: preferencesLoading, error: preferencesError } = usePreferences();
   const [clearModalOpen, setClearModalOpen] = useState(false);
+  const [isClearing, setIsClearing] = useState(false);
 
   useEffect(() => {
     // Redirect to setup if no project exists
@@ -36,28 +37,64 @@ export default function HomePage() {
     }
   }, [project, projectLoading, router]);
 
-  const handleClearAll = () => {
-    clearAll();
-    router.push('/setup');
+  const handleClearAll = async () => {
+    setIsClearing(true);
+    try {
+      // TODO: Implement database clear all
+      // For now, just reload to setup
+      router.push('/setup');
+    } catch (error) {
+      console.error('Error clearing data:', error);
+    } finally {
+      setIsClearing(false);
+      setClearModalOpen(false);
+    }
   };
 
-  const handleToggleEffortVisibility = () => {
-    updatePreferences({ effortColumnVisible: !preferences.effortColumnVisible });
+  const handleToggleEffortVisibility = async () => {
+    if (!preferences) return;
+    try {
+      await updatePreferences({ effortColumnVisible: !preferences.effortColumnVisible });
+    } catch (error) {
+      console.error('Error updating preferences:', error);
+    }
   };
 
-  if (projectLoading || requirementsLoading) {
+  // Show loading state
+  if (projectLoading || requirementsLoading || preferencesLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-indigo-50/50 to-purple-50/50">
         <div className="text-center">
-          <i className="fa-solid fa-spinner fa-spin text-4xl text-primary-500 mb-4"></i>
+          <div className="text-4xl text-primary-500 mb-4">⏳</div>
           <p className="text-gray-600 font-medium">{t('app.loading')}</p>
         </div>
       </div>
     );
   }
 
+  // Show error state
+  if (projectError || requirementsError || preferencesError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-indigo-50/50 to-purple-50/50">
+        <div className="text-center max-w-md">
+          <div className="text-4xl text-red-500 mb-4">⚠️</div>
+          <p className="text-gray-800 font-semibold mb-2">Unable to load application</p>
+          <p className="text-gray-600 text-sm">
+            {projectError || requirementsError || preferencesError}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Redirect to setup if no project
   if (!project) {
-    return null; // Will redirect to setup
+    return null;
+  }
+
+  // Handle case where preferences haven't loaded yet
+  if (!preferences) {
+    return null;
   }
 
   const showTotalEffort = preferences.effortColumnVisible || preferences.showTotalWhenEffortHidden;

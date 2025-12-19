@@ -2,8 +2,11 @@
  * Requirement entity representing a single project requirement
  */
 export interface Requirement {
-  /** Unique identifier (UUID v4) */
-  id: string;
+  /** Unique identifier (database ID) */
+  id: number;
+
+  /** Project ID this requirement belongs to */
+  projectId: number;
 
   /** Requirement description (1-500 characters) */
   description: string;

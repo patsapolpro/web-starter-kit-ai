@@ -2,6 +2,9 @@
  * Project entity representing a single project
  */
 export interface Project {
+  /** Unique project identifier (database ID) */
+  id: number;
+
   /** Project name (1-100 characters) */
   name: string;
 

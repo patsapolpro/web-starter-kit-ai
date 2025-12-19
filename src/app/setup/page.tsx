@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Input } from '@/components/UI/Input';
 import { Button } from '@/components/UI/Button';
 import { validateProjectName } from '@/lib/validation/projectValidation';
-import { createProject, getProject } from '@/lib/storage/project';
+import { createProject as createProjectAPI, fetchProject } from '@/lib/api/client';
 import { useLanguage } from '@/hooks/useLanguage';
 import { LanguageToggle } from '@/components/LanguageToggle/LanguageToggle';
 
@@ -14,17 +14,29 @@ export default function SetupPage() {
   const { t } = useLanguage();
   const [projectName, setProjectName] = useState('');
   const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isCreating, setIsCreating] = useState(false);
 
   useEffect(() => {
     // Check if project already exists, redirect to dashboard
-    const existingProject = getProject();
-    if (existingProject) {
-      router.push('/');
-    }
+    const checkExistingProject = async () => {
+      try {
+        const response = await fetchProject();
+        if (response.success && response.data) {
+          router.push('/');
+        }
+      } catch (err) {
+        // No project exists, stay on setup page
+        console.log('No existing project found, showing setup page');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkExistingProject();
   }, [router]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
@@ -36,14 +48,37 @@ export default function SetupPage() {
     }
 
     // Create project
-    setIsLoading(true);
-    createProject(validation.value || projectName);
+    setIsCreating(true);
+    try {
+      const response = await createProjectAPI({
+        name: validation.value || projectName,
+      });
 
-    // Redirect to dashboard
-    setTimeout(() => {
-      router.push('/');
-    }, 500);
+      if (response.success) {
+        // Redirect to dashboard
+        router.push('/');
+      } else {
+        setError(response.error.message || 'Failed to create project');
+      }
+    } catch (err) {
+      console.error('Error creating project:', err);
+      setError('An unexpected error occurred. Please try again.');
+    } finally {
+      setIsCreating(false);
+    }
   };
+
+  // Show loading state while checking for existing project
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
+        <div className="text-center">
+          <div className="text-4xl text-indigo-500 mb-4">⏳</div>
+          <p className="text-gray-600 font-medium">{t('app.loading')}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 relative overflow-hidden">
@@ -99,8 +134,8 @@ export default function SetupPage() {
                 }
               />
 
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? (
+              <Button type="submit" className="w-full" disabled={isCreating}>
+                {isCreating ? (
                   <>
                     <i className="fa-solid fa-spinner fa-spin"></i>
                     <span>{t('setup.creating')}</span>
